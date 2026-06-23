@@ -1,11 +1,18 @@
 # ReThread AI
 
-AI-powered fashion-waste recycling marketplace prototype (Nigeria-focused),
-built for a pitch competition.
+AI-powered fashion-waste recycling marketplace for Nigeria.
 
-All planning and progress docs live in `docs/`. **Always read `docs/STATUS.md`
-first** — it's the living state of the project, updated at the end of every
-chat session via `/handoff`. `docs/implementation-plan.md` has the
-architecture and is more static.
+## Quick start
 
-User is a 6-year software dev — skip beginner explanations, get to the point.
+```bash
+cd server
+cp .env.example .env   # fill in API keys
+npm install
+npm start
+# → http://localhost:4000
+# Admin panel → http://localhost:4000/admin.html
+```
+
+See `CONTRIBUTING.md` for full setup, environment variables, and API reference.  
+See `docs/implementation-plan.md` for architecture.  
+See `docs/STATUS.md` for current build state and known limitations.

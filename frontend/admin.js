@@ -95,8 +95,7 @@ function renderAnthropicCard(anthropic) {
       <span class="block text-3xl font-display font-extrabold ${remaining !== null ? 'text-mint' : 'text-offwhite'} mt-1">
         ${remaining !== null ? `~$${remaining.toFixed(2)} left` : `$${anthropic.spentThisMonthUsd.toFixed(4)} spent`}
       </span>
-      <p class="text-[11px] text-offwhite-muted">Real spend this month: $${anthropic.spentThisMonthUsd.toFixed(4)} (Cost Report API).
-        ${remaining !== null ? `Estimated from a $${anthropic.startingCreditUsd} starting credit you configured — not a live balance (Anthropic doesn't expose one).` : ''}</p>
+      <p class="text-[11px] text-offwhite-muted">Spend this month: $${anthropic.spentThisMonthUsd.toFixed(4)}</p>
     </div>`;
 }
 

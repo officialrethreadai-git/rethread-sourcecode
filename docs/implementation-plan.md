@@ -2,13 +2,12 @@
 
 ## Project
 AI-powered fashion-waste recycling marketplace (B2B/B2C), Nigeria-focused.
-Prototype/MVP for a pitch competition. Timeline: ~2 days.
+MVP prototype connecting Nigerian tailors (fabric scrap suppliers) with
+designers, students, and upcyclers (buyers).
 
-## Budget
-- $3 credit on **fal.ai** (image generation)
-- $5 credit on **Claude** — location to be confirmed: console.anthropic.com (API
-  platform, usable for this build) vs. claude.ai subscription credit (NOT usable
-  for API calls). Confirm before relying on it.
+## AI services
+- **fal.ai** (`flux-pro/kontext`) — image generation ($0.04/image)
+- **Anthropic Claude** (`claude-haiku-4-5`) — fabric vision analysis
 
 ## Current State (updated — see docs/STATUS.md for the live version)
 - Full-stack prototype running on `http://localhost:4000`. Express serves
