@@ -17,20 +17,18 @@
       background: #557A5C;
     }
 
-    /* Premium Glassmorphism utility */
+    /* Solid, high-contrast card surface. Was translucent glassmorphism —
+       switched to a crisp solid card because blurred low-contrast panels
+       blended into the page on mobile and were harder to read. */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.45);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 25px 50px -12px rgba(120, 110, 90, 0.08);
+      background: #FFFFFF;
+      border: 1.5px solid rgba(26, 24, 22, 0.08);
+      box-shadow: 0 1px 2px rgba(20, 18, 14, 0.04), 0 12px 28px -10px rgba(20, 18, 14, 0.14);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #FFFFFF;
+      border: 1.5px solid rgba(26, 24, 22, 0.1);
     }
 
     .glass-input:focus {
@@ -47,8 +45,9 @@
     /* Tab active transitions */
     .tab-active {
       color: #3D5A42;
-      border-bottom: 2px solid #3D5A42;
-      background: linear-gradient(to top, rgba(61, 90, 66, 0.08), transparent);
+      border-bottom: 3px solid #3D5A42;
+      background: linear-gradient(to top, rgba(61, 90, 66, 0.07), transparent);
+      font-weight: 700;
     }
 
     /* ===== CSS TAB SWITCHING — no JS display needed ===== */
@@ -62,6 +61,10 @@
     }
 
     #marketplace-container {
+      display: none;
+    }
+
+    #my-dashboard-container {
       display: none;
     }
 
@@ -83,6 +86,15 @@
       display: block;
     }
 
+    /* When main has data-tab="mydashboard", show only My Dashboard */
+    main[data-tab="mydashboard"] #landing-page-container {
+      display: none;
+    }
+
+    main[data-tab="mydashboard"] #my-dashboard-container {
+      display: block;
+    }
+
     /* ===== MINIMAL SHADCN-STYLE COMPONENT SYSTEM ===== */
     /* Hand-built to match shadcn/ui's visual language (flat, subtle borders,
        restrained shadows, rounded-lg) without the React/Radix dependency. */
@@ -94,13 +106,18 @@
       gap: 0.5rem;
       white-space: nowrap;
       border-radius: 0.6rem;
-      font-size: 0.8125rem;
-      font-weight: 600;
+      font-size: 0.875rem;
+      font-weight: 700;
       line-height: 1;
-      padding: 0.6rem 1.1rem;
-      border: 1px solid transparent;
+      min-height: 44px;
+      padding: 0.65rem 1.25rem;
+      border: 1.5px solid transparent;
       cursor: pointer;
-      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .sc-btn:active:not(:disabled) {
+      transform: scale(0.97);
     }
 
     .sc-btn:disabled {
@@ -116,10 +133,12 @@
     .sc-btn-primary {
       background: #3D5A42;
       color: #F6F4EB;
+      box-shadow: 0 2px 8px rgba(61, 90, 66, 0.3);
     }
 
     .sc-btn-primary:hover:not(:disabled) {
-      background: #557A5C;
+      background: #4a6e50;
+      box-shadow: 0 4px 16px rgba(61, 90, 66, 0.4);
     }
 
     .sc-btn-outline {
@@ -144,23 +163,26 @@
     }
 
     .sc-btn-sm {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+      min-height: 40px;
       border-radius: 0.5rem;
     }
 
     .sc-btn-lg {
-      padding: 0.85rem 1.75rem;
-      font-size: 0.9375rem;
-      border-radius: 0.7rem;
+      padding: 0.95rem 2rem;
+      font-size: 1rem;
+      min-height: 52px;
+      border-radius: 0.75rem;
     }
 
     .sc-input {
       display: block;
       width: 100%;
+      min-height: 44px;
       border-radius: 0.6rem;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      background: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid rgba(26, 24, 22, 0.12);
+      background: #FFFFFF;
       color: #1A1816;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }

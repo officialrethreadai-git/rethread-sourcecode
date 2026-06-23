@@ -41,7 +41,8 @@ function showBalances() {
   document.getElementById('login-view').classList.add('hidden');
   document.getElementById('balances-view').classList.remove('hidden');
   loadBalances();
-  loadAccessRequests();
+  loadAiGate();
+  loadAccounts();
 }
 
 async function loadBalances() {
@@ -99,40 +100,93 @@ function renderAnthropicCard(anthropic) {
     </div>`;
 }
 
-// GENERATE-ACCESS APPROVAL QUEUE — lets the admin approve which visitors
-// can use the (low-budget) fal.ai image generation feature during a demo.
-async function loadAccessRequests() {
-  const res = await fetch(`${API_BASE}/api/admin/generate-access`);
+// AI GATE — pause or resume scanning + image generation from the admin panel.
+// Use this before a live demo to stop users burning credit, then unpause
+// when you're ready to show the AI features.
+async function loadAiGate() {
+  const res = await fetch(`${API_BASE}/api/admin/ai-gate`);
   if (!res.ok) return;
-  const requests = await res.json();
-  renderAccessRequests(requests);
+  const { paused } = await res.json();
+  renderAiGate(paused);
 }
 
-function renderAccessRequests(requests) {
-  let section = document.getElementById('access-requests-section');
+function renderAiGate(paused) {
+  let section = document.getElementById('ai-gate-section');
   if (!section) {
     section = document.createElement('div');
-    section.id = 'access-requests-section';
+    section.id = 'ai-gate-section';
+    // Insert before balances grid
+    const grid = document.getElementById('balances-grid');
+    grid.parentNode.insertBefore(section, grid);
+  }
+
+  section.innerHTML = `
+    <div class="glass-panel p-4 rounded-2xl flex items-center justify-between gap-4 mb-4 ${paused ? 'border-l-4 border-red-400' : 'border-l-4 border-mint'}">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center ${paused ? 'bg-red-100' : 'bg-mint/10'}">
+          <svg class="w-5 h-5 ${paused ? 'text-red-500' : 'text-mint'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            ${paused
+              ? '<path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+              : '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'}
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-offwhite">AI APIs — <span class="${paused ? 'text-red-400' : 'text-mint'}">${paused ? 'PAUSED' : 'ACTIVE'}</span></p>
+          <p class="text-[10px] text-offwhite-muted">${paused ? 'Scanning and image generation are blocked for all users.' : 'Scanning and image generation are available to approved users.'}</p>
+        </div>
+      </div>
+      <button onclick="toggleAiGate(${!paused})" class="sc-btn ${paused ? 'sc-btn-primary' : 'sc-btn-outline'} sc-btn-sm shrink-0">
+        ${paused ? 'Resume AI' : 'Pause AI'}
+      </button>
+    </div>`;
+}
+
+async function toggleAiGate(pause) {
+  const res = await fetch(`${API_BASE}/api/admin/ai-gate`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ paused: pause }),
+  });
+  if (!res.ok) return;
+  const { paused } = await res.json();
+  renderAiGate(paused);
+}
+
+// ACCOUNT APPROVAL QUEUE — the shared AI budget (fal.ai + Claude, ~$8
+// combined) is small, so visitors must sign up and be approved by the admin
+// before their account can scan fabric or generate images.
+async function loadAccounts() {
+  const res = await fetch(`${API_BASE}/api/admin/accounts`);
+  if (!res.ok) return;
+  const accounts = await res.json();
+  renderAccounts(accounts);
+}
+
+function renderAccounts(accounts) {
+  let section = document.getElementById('accounts-section');
+  if (!section) {
+    section = document.createElement('div');
+    section.id = 'accounts-section';
     section.className = 'space-y-3';
     document.getElementById('balances-view').appendChild(section);
   }
 
-  const pending = requests.filter((r) => r.status === 'pending');
-  const decided = requests.filter((r) => r.status !== 'pending').slice(0, 8);
+  const pending = accounts.filter((a) => a.status === 'pending');
+  const decided = accounts.filter((a) => a.status !== 'pending').slice(0, 10);
 
   section.innerHTML = `
-    <h2 class="font-display font-bold text-lg text-offwhite pt-2">Generate Access Requests</h2>
-    <p class="text-offwhite-muted text-xs">fal.ai credit is limited — approve only the people who should be able to click "Generate Image" during the demo.</p>
+    <h2 class="font-display font-bold text-lg text-offwhite pt-2">Account Requests</h2>
+    <p class="text-offwhite-muted text-xs">The AI budget is shared and limited — approve only the people who should be able to sign in and use the scan/generate features.</p>
     <div class="space-y-2">
-      ${pending.length === 0 ? '<p class="text-xs text-offwhite-muted">No pending requests.</p>' : pending.map((r) => `
+      ${pending.length === 0 ? '<p class="text-xs text-offwhite-muted">No pending account requests.</p>' : pending.map((a) => `
         <div class="glass-panel p-4 rounded-2xl flex items-center justify-between gap-3">
           <div>
-            <p class="text-sm font-semibold text-offwhite">${escapeHtml(r.name)}</p>
-            <p class="text-[10px] text-offwhite-muted">${new Date(r.requestedAt).toLocaleString()}</p>
+            <p class="text-sm font-semibold text-offwhite">${escapeHtml(a.name)}</p>
+            <p class="text-[10px] text-offwhite-muted font-mono">${escapeHtml(a.email)} · ${new Date(a.createdAt).toLocaleString()}</p>
           </div>
           <div class="flex gap-2">
-            <button onclick="respondToAccess('${r.id}', 'approve')" class="sc-btn sc-btn-primary sc-btn-sm">Approve</button>
-            <button onclick="respondToAccess('${r.id}', 'deny')" class="sc-btn sc-btn-outline sc-btn-sm">Deny</button>
+            <button onclick="respondToAccount('${a.id}', 'approve')" class="sc-btn sc-btn-primary sc-btn-sm">Approve</button>
+            <button onclick="respondToAccount('${a.id}', 'deny')" class="sc-btn sc-btn-outline sc-btn-sm">Deny</button>
           </div>
         </div>
       `).join('')}
@@ -141,15 +195,15 @@ function renderAccessRequests(requests) {
       <details class="text-xs text-offwhite-muted">
         <summary class="cursor-pointer">Recent decisions</summary>
         <div class="mt-2 space-y-1">
-          ${decided.map((r) => `<div>${escapeHtml(r.name)} — ${r.status}</div>`).join('')}
+          ${decided.map((a) => `<div>${escapeHtml(a.name)} (${escapeHtml(a.email)}) — ${a.status}</div>`).join('')}
         </div>
       </details>` : ''}
   `;
 }
 
-async function respondToAccess(id, action) {
-  await fetch(`${API_BASE}/api/admin/generate-access/${id}/${action}`, { method: 'POST' });
-  loadAccessRequests();
+async function respondToAccount(id, action) {
+  await fetch(`${API_BASE}/api/admin/accounts/${id}/${action}`, { method: 'POST' });
+  loadAccounts();
 }
 
 function escapeHtml(str) {

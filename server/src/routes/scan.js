@@ -2,11 +2,24 @@ import { Router } from "express";
 import multer from "multer";
 import { classifyFabric } from "../lib/anthropic.js";
 import { isCreditExhaustedError, isAuthError } from "../lib/billing.js";
+import { isAiPaused } from "../lib/aiGate.js";
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 const router = Router();
 
 router.post("/", upload.single("image"), async (req, res) => {
+  if (!req.session?.aiApproved) {
+    return res.status(403).json({
+      error: "Sign in to an approved account to scan fabric",
+      needsAuth: true,
+    });
+  }
+  if (isAiPaused()) {
+    return res.status(503).json({
+      error: "AI scanning is temporarily paused by the admin to protect the demo budget. Please wait a moment and try again.",
+      code: "AI_PAUSED",
+    });
+  }
   if (!req.file) {
     return res.status(400).json({ error: "No image uploaded (field name: image)" });
   }

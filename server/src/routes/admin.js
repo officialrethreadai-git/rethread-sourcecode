@@ -1,7 +1,8 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { getFalBalance, getAnthropicSpend } from "../lib/billing.js";
-import { listRequests, findRequest } from "../lib/generateAccess.js";
+import { listAccounts, findAccount } from "../lib/accounts.js";
+import { getAiGateState, setAiPaused } from "../lib/aiGate.js";
 
 const router = Router();
 
@@ -43,29 +44,38 @@ router.get("/balances", requireAdmin, async (_req, res) => {
   res.json({ fal, anthropic });
 });
 
-// GENERATE-ACCESS APPROVAL QUEUE — fal.ai credit is limited, so the admin
-// (not every visitor) decides who can call the image-generation feature.
-router.get("/generate-access", requireAdmin, (_req, res) => {
-  res.json(listRequests());
+// AI GATE — admin can pause/unpause scan + generate to protect the budget
+router.get("/ai-gate", requireAdmin, (_req, res) => {
+  res.json(getAiGateState());
 });
 
-router.post("/generate-access/:id/approve", requireAdmin, (req, res) => {
-  const request = findRequest(req.params.id);
-  if (!request) return res.status(404).json({ error: "Request not found" });
-
-  request.status = "approved";
-  req.sessionStore.get(request.sessionID, (err, sessionData) => {
-    if (err || !sessionData) return res.status(200).json({ ok: true, warning: "Requester session expired" });
-    sessionData.canGenerate = true;
-    req.sessionStore.set(request.sessionID, sessionData, () => res.json({ ok: true }));
-  });
+router.post("/ai-gate", requireAdmin, (req, res) => {
+  const { paused } = req.body || {};
+  setAiPaused(paused);
+  res.json({ ok: true, paused: Boolean(paused) });
 });
 
-router.post("/generate-access/:id/deny", requireAdmin, (req, res) => {
-  const request = findRequest(req.params.id);
-  if (!request) return res.status(404).json({ error: "Request not found" });
+// ACCOUNT APPROVAL QUEUE — the shared AI budget (fal.ai + Claude) is small,
+// so the admin (not every visitor) decides who gets to sign in and use it.
+// Approval just flips account.status; the user has to log in (again) to pick
+// up an aiApproved session, so there's no need to reach into live sessions.
+router.get("/accounts", requireAdmin, (_req, res) => {
+  res.json(listAccounts());
+});
 
-  request.status = "denied";
+router.post("/accounts/:id/approve", requireAdmin, (req, res) => {
+  const account = findAccount(req.params.id);
+  if (!account) return res.status(404).json({ error: "Account not found" });
+
+  account.status = "approved";
+  res.json({ ok: true });
+});
+
+router.post("/accounts/:id/deny", requireAdmin, (req, res) => {
+  const account = findAccount(req.params.id);
+  if (!account) return res.status(404).json({ error: "Account not found" });
+
+  account.status = "denied";
   res.json({ ok: true });
 });
 

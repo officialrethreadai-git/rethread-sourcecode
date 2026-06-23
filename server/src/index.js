@@ -9,7 +9,7 @@ import scanRouter from "./routes/scan.js";
 import generateRouter from "./routes/generate.js";
 import marketplaceRouter from "./routes/marketplace.js";
 import adminRouter from "./routes/admin.js";
-import generateAccessRouter from "./routes/generateAccess.js";
+import accountsRouter from "./routes/accounts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const staticDir = path.join(__dirname, "../../frontend");
@@ -38,7 +38,7 @@ app.use("/api/scan", scanRouter);
 app.use("/api/generate", generateRouter);
 app.use("/api/marketplace", marketplaceRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api/generate-access", generateAccessRouter);
+app.use("/api/accounts", accountsRouter);
 
 app.use(express.static(staticDir));
 

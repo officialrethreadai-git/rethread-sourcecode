@@ -161,7 +161,46 @@ committed — same handling as the original two keys in section 2.
 
 ---
 
-## 4. What this produced
+## 4. Third session — real accounts, marketplace ownership (consolidated)
+
+A later session replaced the earlier name-only "request access" system with
+real visitor accounts, and tied the marketplace to them:
+
+```
+Users should be able to create an account, with the admin approving each one
+before they can use our shared AI budget (~$8 combined across fal.ai and
+Claude) — this replaces the earlier flow where a visitor just typed a name
+to request fal.ai access. Broaden the gate to cover scanning too, not just
+image generation, since Claude scans also spend real credit.
+
+Make the sign-up/log-in UI a modal popup on the main site, not a separate
+page like the admin login.
+
+Approved users should also be able to post listings on the Marketplace and
+"buy" (reserve) other people's listings, each with their own dashboard
+showing what they've listed and reserved. The sign-up modal should ask for
+name, email, and password — the name is what's displayed on the dashboard.
+```
+
+No real payment processing was added — "buy" claims a listing under the
+buyer's account (an honest, scoped interpretation consistent with
+"Integrated Payments" already being listed as Coming Soon). Implemented as:
+`server/src/lib/accounts.js` + `server/src/routes/accounts.js` (signup,
+login, logout, me), `server/src/routes/admin.js` extended with an
+account-approval queue, `/api/scan` and `/api/generate` both gated behind
+`req.session.aiApproved`, `/api/marketplace` extended with `vendorId`/
+`buyerId` ownership and a `/api/marketplace/:id/reserve` endpoint, and a new
+`GET /api/marketplace/mine` endpoint backing a new "My Dashboard" tab in
+`frontend/index.html`/`app.js`. The old `server/src/lib/generateAccess.js`
+and `server/src/routes/generateAccess.js` were deleted outright rather than
+kept alongside the new system. Full flow (signup → pending → admin approve →
+login → scan/generate/list/reserve, including the self-reserve and
+double-reserve guards) was tested end-to-end with curl before considering it
+done.
+
+---
+
+## 5. What this produced
 
 See `docs/implementation-plan.md` for the resulting architecture,
 `docs/STATUS.md` for what's actually built as of the last `/handoff`, and

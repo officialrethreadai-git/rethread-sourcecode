@@ -16,40 +16,48 @@ them into something sellable.
 
 ## What happens when someone uses it, step by step
 
-1. You open the "Creator Dashboard" tab and either drag a fabric photo onto
+1. First-time visitors click "Sign In" and create an account — just a name,
+   email, and password, in a popup (not a separate page). The admin then has
+   to approve that account from the admin panel before it can be used (more
+   on why below). Once approved, you sign in from the same popup.
+2. You open the "Creator Dashboard" tab and either drag a fabric photo onto
    the upload box (or click it / use "Browse Files"), or click the green
    "Sample Ankara" button to try it with a real demo photo that's already
    loaded.
-2. You can optionally type in the scrap's length, width, weight, and what
+3. You can optionally type in the scrap's length, width, weight, and what
    size garment you'd want (e.g. "Medium") — none of this is required.
-3. The photo gets sent to **Claude** (Anthropic's AI). Think of it like
+4. The photo gets sent to **Claude** (Anthropic's AI). Think of it like
    showing the photo to an expert tailor who instantly tells you: what kind
    of fabric it is, its color, its condition, and 2–3 things you could
    realistically make from it, with an estimated naira value for each. While
    this is happening, the screen shows real status messages ("Checking fiber
    type...", "Matching against zero-waste product ideas...") so it doesn't
    look frozen.
-4. Those suggestions show up as cards on screen — this is real, not pretend.
-5. For any suggestion, you can click "Generate Image." This sends the
+5. Those suggestions show up as cards on screen — this is real, not pretend.
+6. For any suggestion, you can click "Generate Image." This sends the
    original fabric photo plus the chosen product idea (and your size, if you
    gave one) to **fal.ai**, a different AI that draws realistic product
    photos. It paints what that tote bag / bandana / dress would actually look
    like, made from your exact fabric's color and pattern — on a model if it's
    a wearable item, as a flat product shot otherwise.
-6. You can click "List & Sell" to add that suggestion to the Marketplace tab,
-   where anyone can browse real listings (not just post them).
+7. You can click "List & Sell" to add that suggestion to the Marketplace tab,
+   where anyone (signed in or not) can browse real listings.
+8. Anyone with an approved account can click "Reserve" on someone else's
+   listing to claim it — no real money changes hands yet (see Coming Soon
+   below), it just marks the item as theirs. Your own posted items and your
+   reservations both show up under the "My Dashboard" tab, which only you can
+   see.
 
-## Why you sometimes have to "request access" before generating an image
+## Why you sometimes have to "request access" before scanning or generating
 
-The image-generating AI (fal.ai) costs real money every time it's used, and
-the team's remaining credit is small. So instead of letting any random
-visitor click "Generate Image" as many times as they want, the app asks
-first-time visitors to type their name and "request access." Someone with
-the admin login then approves or denies that specific person from the admin
-panel. Think of it like asking a manager to swipe the company card — it's not
-a bug, it's there on purpose to protect the budget during the live demo.
-Once approved, that person can generate images normally for the rest of
-their visit.
+Both AI services cost real money every time they're used, and the team's
+remaining combined credit (~$8) is small. So instead of letting any random
+visitor scan fabric, generate images, or post/reserve marketplace listings
+as many times as they want, the app requires a free account that the admin
+has to approve first. Think of it like asking a manager to swipe the company
+card — it's not a bug, it's there on purpose to protect the budget during the
+live demo. Once approved, that person can use every AI/marketplace feature
+normally for the rest of their visit (until they sign out).
 
 ## What the admin panel does (`/admin.html`)
 
@@ -61,8 +69,9 @@ username/password) can:
   (Anthropic just doesn't offer that), so instead the panel shows real money
   spent so far this month and an estimated amount left, clearly labeled as an
   estimate.
-- See everyone who has clicked "request access" to generate images, and
-  approve or deny each one with a button.
+- See everyone who has signed up for an account, and approve or deny each
+  one with a button. Only approved accounts can scan fabric, generate
+  images, post marketplace listings, or reserve items.
 
 If either of these AI services runs out of money or its key stops working
 mid-demo, the app shows a clear message telling the visitor to contact the
@@ -84,13 +93,17 @@ genuinely low — which is exactly why the access-approval system above exists.
 ## What's real vs. what's still a placeholder
 
 **Real and working right now:**
+- Real account sign-up/sign-in (name, email, password) via a popup, gated by
+  admin approval
 - Drag-and-drop (or click) photo upload, and the live demo button
 - Real AI fabric identification (Claude), including optional size input
-- Real AI-generated product images (fal.ai), gated by admin approval
+- Real AI-generated product images (fal.ai)
 - A working server behind the website (not fake/simulated)
 - A real, browsable Marketplace tab — not just a posting form
+- Real "Reserve" (claim an item under your account — no payment yet)
+- A real "My Dashboard" tab showing your own listings and reservations
 - A real admin login with real AI credit numbers (or honest "can't check
-  that" messages — never a made-up number)
+  that" messages — never a made-up number) and an account-approval queue
 - Friendly messages if AI credit runs out or a key stops working
 
 **Marked "Coming Soon" in the app — not built yet, don't claim these in a demo:**
@@ -101,8 +114,8 @@ genuinely low — which is exactly why the access-approval system above exists.
 - Supplier Verification badges
 - Mobile app (the website itself is mobile-friendly, but there's no
   separate native app)
-- Integrated payments (no real money moves through the app — "Reserve" on a
-  marketplace listing is intentionally disabled)
+- Integrated payments (no real money moves through the app — "Reserve"
+  claims an item under your account, but no payment is processed)
 - Notifications system
 - A permanent database (right now, if the server restarts, listings and
   access requests reset — fine for a demo, not for real users yet)
@@ -122,8 +135,11 @@ genuinely low — which is exactly why the access-approval system above exists.
 - **Endpoint** — one specific thing the backend can be asked to do, like "scan
   this photo" or "list this item for sale."
 - **Session** — how the website remembers it's still talking to the same
-  visitor between clicks (e.g. so it remembers you were approved for image
-  generation without you having to log in).
+  visitor between clicks (e.g. so it remembers you're signed in without
+  asking for your password on every page).
+- **Account** — your name, email, and password, used to sign in. New
+  accounts start as "pending" and can't use any AI feature until the admin
+  approves them.
 - **Credit / balance** — prepaid money on an AI account that gets used up a
   little bit each time the AI is called, like a phone recharge card.
 - **Prototype / MVP** — the first simple working version, which is what this

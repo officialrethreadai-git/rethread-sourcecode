@@ -5,175 +5,196 @@
 > the architecture.
 
 ## Last updated
-2026-06-23 — major session: renamed `landingpage-dashboard/` to `frontend/`,
-rebuilt the UI with a minimal shadcn-style component system + mobile
-hamburger nav, added real drag-and-drop upload, added a single-admin login
-with real (not faked) fal.ai/Anthropic credit visibility, added an
-admin-approval gate in front of fal.ai image generation to protect the low
-remaining budget, added an optional garment-size input, added honest
-"credit exhausted" / "AI unavailable" error handling, added wait-time
-animations, and added a Render deploy blueprint. This is a team/platoon
-project for NYSC camp, not a two-person project — correct any assumption
-elsewhere that frames it as just the user + one co-founder.
+2026-06-23 — fourth session: major UX/design overhaul, Nigerian cultural AI
+tuning, designer requests marketplace, search/filter, admin AI kill-switch,
+fabric education cards (13 types + Nigerian tailoring materials awareness),
+generated image local persistence, demo-without-login flow, homepage hero
+rewrite. Pre-launch state — only missing sample fabric photos for demo buttons.
 
 ## Done so far
 
 ### Backend (`server/`, Node 24, Express, ES modules)
-- `POST /api/scan` — Claude Haiku 4.5 vision call. Returns materialType,
-  colorProfile, condition, confidencePercent, suggestedProducts[]. Now also
-  accepts an optional `preferredSize` field (e.g. "Medium") that's factored
-  into Claude's suggestions and feasibility notes.
-- `POST /api/generate` — fal.ai `fal-ai/flux-pro/kontext`. Takes the scrap
-  photo + one chosen product idea + optional `sizeHint`, returns a generated
-  concept image URL. **Now gated**: requires `req.session.canGenerate`,
-  returns `403 {needsAccess:true}` otherwise (see Access control below).
-- `GET/POST /api/marketplace` — in-memory listings store.
-- `POST /api/generate-access/request`, `GET /api/generate-access/status` —
-  public endpoints for a visitor to request/check generate access.
-- `POST /api/admin/login`, `/logout`, `GET /api/admin/me` — single
-  super-admin session auth (bcrypt password hash, `express-session`).
-- `GET /api/admin/balances` — real fal.ai balance (`/v1/account/billing`,
-  needs `FAL_ADMIN_KEY`) + real Anthropic spend this month (Cost Report API,
-  needs `ANTHROPIC_ADMIN_KEY`) with an estimated-remaining figure computed
-  from a configurable starting credit. **No faked numbers**: if a key isn't
-  configured, the panel says so and links to the real dashboard instead.
-- `GET/POST /api/admin/generate-access[...]` — admin lists pending access
-  requests and approves/denies them; approval flips `canGenerate` on the
-  *requester's own* server-side session via `req.sessionStore`.
-- Express serves `frontend/` statically — one process, one URL.
-- Both Claude and fal.ai errors are now classified: insufficient credit
-  (`402 INSUFFICIENT_CREDIT`) vs. invalid/revoked key (`401 AI_UNAVAILABLE`),
-  each with a user-facing message rather than a raw technical error.
+- `POST /api/scan` — Claude Haiku 4.5 vision. Returns `materialType`,
+  `colorProfile`, `condition`, `confidencePercent`, `colors[]` (name+hex+role),
+  `suggestedProducts[]`. Gated behind `req.session.aiApproved` (403
+  `needsAuth:true` otherwise). Also checks `isAiPaused()` — returns 503
+  `AI_PAUSED` if admin has paused the AI gate.
+- `POST /api/generate` — fal.ai `fal-ai/flux-pro/kontext` ($0.04/image,
+  confirmed). Takes fabric photo + product idea + optional sizeHint +
+  materialType. Returns `/generated/<uuid>.jpg` (locally saved copy —
+  fal.ai CDN URLs expire in ~1hr, local copy doesn't). Checks `isAiPaused()`.
+  Nigerian/African model prompt: Ankara → modern Lagos studio; Aso-Oke →
+  traditional ceremony courtyard; bags → model carrying; hats → styled flat-lay.
+- `GET /api/marketplace` — in-memory listings, open to everyone.
+- `GET /api/marketplace/requests` — designer requests board, open to everyone.
+  3 seed requests pre-loaded. `POST /api/marketplace/requests` (aiApproved) to
+  add new requests.
+- `POST /api/marketplace` — list an item (aiApproved).
+- `POST /api/marketplace/:id/reserve` — claim a listing (aiApproved, blocks
+  self-reserve and double-reserve).
+- `GET /api/marketplace/mine` — logged-in user's own listings + reservations +
+  their posted requests.
+- `GET /api/admin/ai-gate`, `POST /api/admin/ai-gate` — admin can pause/unpause
+  all AI endpoints. State held in `server/src/lib/aiGate.js` (in-memory toggle).
+- `GET /api/admin/accounts`, `POST /api/admin/accounts/:id/approve|deny`.
+- `GET /api/admin/balances` — real fal.ai balance + Anthropic spend estimate.
+- `POST /api/accounts/signup|login|logout`, `GET /api/accounts/me`.
+- `POST /api/admin/login|logout`, `GET /api/admin/me`.
+- Express serves `frontend/` statically including `frontend/generated/`
+  (gitignored) where fal.ai images are saved.
+- Error codes: `INSUFFICIENT_CREDIT` (402), `AI_UNAVAILABLE` (401),
+  `AI_PAUSED` (503) — all handled distinctly on the frontend.
 
-### Frontend (`frontend/`, renamed from `landingpage-dashboard/`)
-- Split into `index.html` (markup + tiny inline Tailwind config),
-  `style.css`, `app.js` (dashboard/marketplace logic), `admin.js` (admin
-  panel logic), `admin.html` (separate admin login + balances page, not
-  linked from the main nav).
-- **Mobile**: hamburger menu (slide-in sheet) replaces the cramped inline tab
-  row below `md` breakpoint; desktop keeps the horizontal tab bar. Marketplace
-  grid is 2-up on mobile per explicit request (was 1-up). Reviewed for
-  horizontal-overflow risk — none found; `body` also has `overflow-x-hidden`
-  as a backstop.
-- **Component system**: hand-built minimal shadcn-style classes (`sc-btn`,
-  `sc-btn-primary/outline/ghost`, `sc-input`, `sc-badge`) in `style.css` —
-  flat, subtle borders, restrained shadows, no React/Radix dependency since
-  this is a static-file build with no bundler. Applied to all real buttons
-  and inputs (waitlist, dimensions, demo button, generate/list/reserve,
-  marketplace refresh).
-- **Real Marketplace tab** — `GET /api/marketplace` rendered as browsable
-  cards (previously listings could only be posted, never browsed).
-- **Real drag-and-drop upload** — the drop-zone previously *looked*
-  drag-and-drop-capable but had zero event listeners wired; clicking it did
-  nothing outside the small "Browse Files" button. Now wired for real:
-  `dragenter/dragover/dragleave/drop` + click-anywhere-in-zone.
-- **Optional size input** — `#input-size` next to length/width/weight, flows
-  into both `/api/scan` (Claude factors it into suggestions) and
-  `/api/generate` (fal.ai prompt includes a sizing hint for worn-by-model
-  shots).
-- **Generate-access UI** — if `/api/generate` returns `needsAccess`, the card
-  swaps its action buttons for an inline "request access" form; after
-  requesting, the user sees "ask the admin to approve" and a retry button.
-- **Wait-time UX** — scan view cycles through 4 real-status messages while
-  Claude analyzes; the generate button's media placeholder gets a shimmer
-  animation + 4 cycling captions while fal.ai renders (10-30s), instead of
-  sitting frozen.
-- **Honest stats**: dashboard's "Scrap Material Scanned / Generated Patterns
-  / Circular Revenue" boxes were hardcoded with fake non-zero baselines
-  (48.2kg, 14 Drafts, ₦480,000) — reset to honest 0 / ₦0.00.
-- **GSAP + ScrollTrigger** (CDN) for landing-page scroll-reveal animations,
-  **Three.js** (CDN, r128) for a decorative rotating wireframe icosahedron
-  behind the hero. Both feature-detected so a failed CDN load degrades
-  silently rather than breaking real app logic. Purely visual, no API cost.
+### Frontend (`frontend/`)
+- **Visual system**: `.glass-panel` switched from translucent blur to solid
+  `#FFFFFF` card with real shadow — was causing "fake/templatey" look. Body
+  background `#EAE5D8` (forest-dark) so white cards pop. Decorative blur orbs
+  now `hidden md:block` (mobile performance + clarity).
+- **Touch targets**: all `sc-btn` min-height 44px, `sc-btn-sm` 40px, `sc-btn-lg`
+  52px. Active scale press feedback added. Font-weight bumped to 700.
+- **Icons**: feature cards + upload box + section headers use solid mint chips
+  (bold green square, white icon) instead of pastel-tint rings.
+- **Hero**: rewritten — "Got leftover fabric? Your AI turns it into money." +
+  plain-English 1-line subtitle + 3-step icon flow (Snap → AI suggests → Sell)
+  + dual CTA (Start for Free / See Live Demo). Waitlist form removed (real
+  accounts exist now). "Landing Page" tab renamed to "Home".
+- **Demo without login**: clicking "Sample Ankara" when not signed in shows
+  `DEMO_SCAN_RESULT` (static pre-baked result) instantly — full scan summary,
+  fabric education card, color palette, 3 product cards + notice banner. No API
+  cost. `Generate Image` hits auth gate gracefully. Real API runs when signed in.
+- **Fabric education cards** (`#fabric-lore-card`): appears after any scan for
+  13 known fabric types. Shows origin, also-known-as, cultural description,
+  market value. Types: Ankara, Aso-Oke, Adire, Kente, Denim, Lace, George,
+  Guinea Brocade/Damask, Hollandaise, Atiku/Senator, Velvet, Chiffon, Satin,
+  Cotton.
+- **Color palette** (`#color-palette`): 2–4 hex swatches per scan. Click/tap
+  any swatch or "Copy" to copy hex to clipboard. Auto light/dark text contrast.
+- **Marketplace — two views**:
+  - "Available Fabric": existing listings grid + search bar (title/keyword) +
+    material-type dropdown filter (client-side).
+  - "What Designers Need": requests board, `loadRequests()` from
+    `/api/marketplace/requests`. "Post a Request" button opens a modal form
+    (title, material type, color notes, quantity, budget). Requests badge count
+    shown on toggle tab.
+- **Admin AI gate** in `/admin.html`: banner at top of balances view showing
+  ACTIVE/PAUSED state with one-click toggle button. Red border + pause icon when
+  paused; green + check when active.
+- **My Dashboard** (`#my-dashboard-container`): shows own listings, own
+  reservations, own posted requests (via `GET /api/marketplace/mine`). Solid
+  amber badge for "reserved" status.
+- **Post a Request modal** (`#request-modal`): full form with fabric type
+  dropdown matching all 13 lore types. Auth-gated (opens auth modal if not
+  signed in).
+
+### Claude prompt (anthropic.js) — complete overhaul this session
+- **Size-aware**: estimates scrap size from photo (TINY/SMALL/MEDIUM/LARGE/VERY
+  LARGE) and calibrates suggestions — no dress suggestions for a tiny scrap.
+- **Color-specific**: every product description must name the actual colors seen
+  in the photo (e.g. "the deep indigo and burnt orange print will pop at any
+  owambe").
+- **Outfit-first**: outfits are the PRIMARY suggestion for Nigerian fabrics at
+  medium-to-large size. Accessories only for genuinely small pieces.
+- **Nigerian cultural knowledge**: Ankara → wrap dress/Kaftan; Aso-Oke →
+  ceremonial Gele/Iro & Buba; Adire → contemporary fashion + wall art; George →
+  Iro wrappers/bridal; Denim → streetwear/patchwork; Lace → evening/bridal.
+- **Supporting materials awareness**: suggests 1–2 supporting materials per
+  product with real Balogun/Yaba 2025 prices (By-cotton lining, Airstay,
+  invisible zip, hemming gum, bias tape — common; bra cup, rigilene bone,
+  collar gum — only when relevant). Specialist items (steel bone, crinoline,
+  hot-fix stones) only if specifically applicable.
+- **Colors field**: returns 2–4 `{name, hex, role}` objects.
+- `max_tokens` bumped to 1500 (was 1024 — was truncating richer responses).
 
 ### Admin / access control
-- Single super-admin login lives at `/admin.html`, not in the main nav (not
-  meant for visitors to find casually). Credentials: `ADMIN_USERNAME` +
-  `ADMIN_PASSWORD_HASH` (bcrypt) in `server/.env`. **The initial generated
-  password was shown once in chat** (username `admin`) — change it before
-  the real demo if you want; regenerate the hash with the command in
-  `server/.env.example`.
-- fal.ai credit is genuinely low (**$2.97 confirmed live** via the real
-  billing API as of this session) — this is why image generation is now
-  gated behind admin approval rather than open to every visitor.
-- Anthropic has **no live balance API** at all (confirmed via search +
-  testing) — only a real Cost Report API (historical spend). The admin panel
-  shows real spend-this-month plus an estimated remaining balance computed
-  from spend vs. a configurable `ANTHROPIC_STARTING_CREDIT_USD` (default 5),
-  clearly labeled as an estimate, never presented as a live number.
+- Single super-admin at `/admin.html`. Credentials: `ADMIN_USERNAME` +
+  `ADMIN_PASSWORD_HASH` in `server/.env`. Change before real demo.
+- **AI Kill-switch** (new): admin can pause ALL AI endpoints (scan + generate)
+  from the admin panel without restarting the server. Use before demo, unpause
+  when ready. State in `server/src/lib/aiGate.js`.
+- fal.ai credit: ~$2.97 = ~74 more images at $0.04/image (confirmed via
+  `fal-ai/flux-pro/kontext` pricing — this model cannot be swapped for a
+  cheaper one since all cheaper options are text-to-image only, not
+  image-to-image).
+- `frontend/generated/` gitignored — locally saved fal.ai images go here.
 
 ### Deployment
-- `render.yaml` at repo root — one Web Service (not split static+API, since
-  Express already serves both from one process). Secrets are marked
-  `sync: false` so they're entered directly in Render's dashboard, never
-  committed or pasted into chat.
-- `docs/DEPLOY.md` — step-by-step: push to GitHub → Render "New > Blueprint"
-  → paste secrets in Render's UI → deploy. No Render API key or MCP needed;
-  GitHub-connected Blueprint deploys don't require one.
+- `render.yaml` at repo root — one Web Service. Secrets marked `sync: false`.
+- `docs/DEPLOY.md` — push to GitHub → Render Blueprint → enter secrets → deploy.
 
 ## In progress
 - Nothing mid-way. Server runs via `cd server && npm start`, serves
-  `http://localhost:4000` (main app) and `http://localhost:4000/admin.html`
-  (admin panel).
+  `http://localhost:4000` and `http://localhost:4000/admin.html`.
+- Claude prompt supporting-materials section just added — not yet tested with
+  a real scan (server restarted with changes in place, but no scan run after).
 
 ## Next steps
-1. Manually click through the full flow in an actual browser — verified via
-   curl/script that every route returns correctly and the access-approval
-   flow works end-to-end (request → admin approves → requester's session
-   flips), but no human has clicked through the real UI yet this session.
-2. Get real fabric photos (Denim, Aso-Oke, ideally Adire) to replace the two
-   disabled "Coming Soon" demo slots with working ones — see the asset
-   recommendations given in chat. Drop files in `frontend/assets/`.
-3. Get a team/platoon photo (not a "founder duo" — this is an NYSC
-   camp/platoon project) for a credibility section if one gets added.
-4. Decide on persistence: in-memory marketplace + admin-access requests
-   reset on server restart (and on every Render free-tier spin-down/deploy).
-   Fine for the demo; flag if judges will restart between runs.
-5. Push to GitHub, then deploy via the Render blueprint (`docs/DEPLOY.md`)
-   before the actual pitch/demo — free-tier services sleep after inactivity,
-   so do a warm-up request a few minutes beforehand.
-6. fal.ai credit is very low ($2.97 confirmed) — the generate-access approval
-   gate exists specifically to prevent random visitors from burning it during
-   a live demo. Approve generously for trusted people, sparingly for anyone
-   else.
+1. **Get two sample fabric photos** (this is the only thing holding up the
+   demo buttons): need a clear photo of Denim scrap → save as `frontend/denim.jpg`;
+   need a clear photo of Aso-Oke scrap → save as `frontend/aso-oke.jpg`. Then
+   wire up the two disabled demo buttons in `index.html` (search for "Coming
+   Soon" in the demo fabric panel — change `div` to `button` and call
+   `runDemoFabric('denim.jpg')` / `runDemoFabric('aso-oke.jpg')`). Update
+   `runDemoFabric()` in `app.js` to accept a filename param.
+2. Full browser click-through — auth modal, scan, generate, list, browse
+   marketplace (both views), post a request, My Dashboard. No human has done
+   this since the redesign.
+3. Push to GitHub (`git add -A && git commit -m "..."` + `git push`).
+4. Deploy via Render blueprint (see `docs/DEPLOY.md`). Do a warm-up request
+   1–2 minutes before the actual demo (Render free tier sleeps).
+5. Admin: before the demo, log into `/admin.html`, hit **Pause AI**, let the
+   demo audience see the homepage + marketplace, then **Resume AI** when you're
+   ready to scan live.
 
 ## Decisions log
-- Skipping TensorFlow/MobileNet/local model training and SQLite from the
-  original advice — too slow for a 2-day build. Using hosted APIs instead.
-- Removed the fake denim/linen/silk presets entirely rather than keep them
-  faking results — replaced with one real demo button + explicit
-  "Coming Soon" slots.
-- `fal-ai/flux-pro/kontext` confirmed as the right fal.ai model for
-  fabric→product image generation.
-- Split `index.html` into `index.html` + `style.css` + `app.js` (+ later
-  `admin.html`/`admin.js`) per explicit user request, rather than one file.
-- Added GSAP + Three.js per explicit request ("make it a standard website"),
-  kept strictly decorative so a CDN failure can't break real functionality.
-- Renamed `landingpage-dashboard/` → `frontend/` per explicit request; updated
-  the server's static path and all doc references.
-- Built the admin balance panel to show **only real numbers**: fal.ai's
-  actual billing API (confirmed working, $2.97), Anthropic's actual Cost
-  Report API (no balance API exists for Anthropic at all — confirmed via
-  research — so "remaining" is explicitly labeled as an estimate, not a live
-  figure). Chose this over faking either number, consistent with the earlier
-  decision to remove fake presets/stats.
-- Added a generate-access approval system (admin approves who can use
-  `/api/generate`) specifically because fal.ai credit is low and the demo
-  will be public-facing — protects against accidental/malicious burn-through.
-- `saveUninitialized: true` on the session middleware (not `false`) — without
-  it, a session is never persisted until something writes to `req.session`,
-  which broke the access-approval flow (the admin had nothing to attach an
-  approval to). Caught via direct curl testing before it shipped.
-- Credit-exhausted vs. invalid-key errors are distinguished server-side
-  (`INSUFFICIENT_CREDIT` 402 vs. `AI_UNAVAILABLE` 401) so the user sees an
-  accurate, distinct message in either case rather than a generic failure.
+- Skipping TensorFlow/MobileNet/SQLite — too slow for a 2-day prototype.
+- `fal-ai/flux-pro/kontext` is the correct and only viable fal.ai model for
+  this use-case (reference-image → product image). Confirmed $0.04/image.
+  Cheaper models (flux/dev at $0.025/MP etc.) are text-to-image only.
+- Generated images are saved locally to `frontend/generated/<uuid>.jpg`
+  immediately after fal.ai returns them. Reason: fal.ai CDN URLs expire in ~1hr.
+  Fallback to fal URL if local save fails (graceful degradation).
+- `DEMO_SCAN_RESULT` static object in `app.js` for non-logged-in demo: shows
+  judges the full product without burning API credit. Real scan runs when signed
+  in. Decision: keep it high-quality and realistic so it's genuinely impressive.
+- Admin AI gate (`/api/admin/ai-gate`): in-memory toggle (not persisted across
+  restarts). Reason: it's a live-demo safety valve, not a permanent setting.
+  Restarting the server resets it to "active" which is the safe default.
+- Claude cannot browse the internet — it's a vision model, not a browser agent.
+  Nigerian fabric/cultural knowledge is baked into the system prompt instead.
+  This is sufficient; Claude's training data already knows Nigerian fabrics.
+- Supporting materials (By-cotton, airstay, invisible zip, etc.) added to
+  Claude prompt as context for product descriptions only — not as scannable
+  items. The scan is for fabric scraps, not tailoring supplies.
+- `saveUninitialized: true` on session middleware (required — without it no
+  session cookie is issued before first write, breaking auth flow).
+- fal.ai model for bags: model carrying/holding (not flat-lay). Hats: styled
+  on a wooden/marble surface (not on a model head per user preference).
+- Waitlist form removed from hero — replaced with two CTAs that open the real
+  auth modal or go to the scanner. Having both a waitlist form and a "Sign In"
+  button was confusing.
+- Marketplace now has two views: "Available Fabric" (listings) and "What
+  Designers Need" (requests). Requests board solves the missing "connect
+  designers" direction from the original brief.
+- `frontend/generated/` added to `.gitignore` — generated images don't belong
+  in the repo.
 
 ## Open questions / blockers
-- None currently blocking. fal.ai balance confirmed live at $2.97; Anthropic
-  API access confirmed working (no balance API exists, but spend tracking
-  does, via the Admin Cost Report API).
-- Live secrets pasted directly into chat this session (fal.ai key, fal.ai
-  Admin key, Anthropic Admin key) were stored immediately in the gitignored
-  `server/.env` and never echoed back — same handling as the original two
-  keys. **Reminder for future sessions**: never display `server/.env`
-  contents in a chat response.
+- **Demo photos needed** (not a blocker for launch, but Denim and Aso-Oke demo
+  buttons will remain "Coming Soon" without them). See Next Steps #1.
+- fal.ai credit: ~$2.97 (~74 images). Admin should approve accounts carefully
+  and use the AI pause gate before public-facing demos.
+- In-memory data resets on server restart (listings, accounts, requests). Fine
+  for a demo. Render free tier spins down after inactivity — do a warm-up
+  request before the demo.
+- **Scan/generation history not persisted** (known future issue): when a signed-in
+  user scans fabric and generates images, then refreshes the page, all gallery
+  cards and scan results are gone. The generated image FILES exist on disk at
+  `frontend/generated/uuid.jpg` but nothing links them back to the user's
+  account. Solving this requires a database (SQLite is the lightest option) to
+  store scan results + product cards + image filenames per userId, and a
+  "My Scan History" section in My Dashboard. Not needed for the demo (server
+  runs continuously during the pitch) but is a day-1 post-launch priority.
+- **Reminder**: never display `server/.env` contents in a chat response. Secrets
+  are in `.env` (gitignored). Admin password was shown once in an earlier
+  session — change it before the real demo using the command in
+  `server/.env.example`.
