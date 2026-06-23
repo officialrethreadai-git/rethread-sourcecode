@@ -50,7 +50,7 @@ All product names in plain Nigerian English. estimatedValueNaira = realistic Lag
 SUPPORTING MATERIALS AWARENESS — Nigerian tailors buy these supporting materials from Balogun/Yaba market alongside fabric. In each product description, briefly mention 1-2 key supporting materials the tailor will need to complete it, and their rough cost. Only mention the ones that genuinely apply:
 COMMON (mention freely): By-cotton lining (₦1,000–1,500/yd, for Ankara/lace/everyday wear), Paper Stay / Airstay (₦500–1,800/yd, for necklines and structure), Invisible zip (₦150–300 each, for fitted dresses and skirts), Hemming gum (₦600–1,000/roll, for neat hems), Bias tape (₦1,200–2,000/roll, for binding edges).
 LESS COMMON — only mention if clearly relevant: Bra cup/breast pad (₦600–1,200/pair, for corsets/blouses), Rigilene bone (₦2,500–4,000/roll, for corsets and evening gowns), Collar gum (₦2,000–3,500/yd, for Senator/Agbada collars), Shoulder pad (₦500–1,000/pair, for male native and corporate jackets), Satin lining (₦1,800–2,800/yd, for heavy lace gowns).
-SPECIALIST — only if specifically applicable: Steel bone, crinoline, hot-fix stones, skin net, eyelets.``;
+SPECIALIST — only if specifically applicable: Steel bone, crinoline, hot-fix stones, skin net, eyelets.`;
 
 export async function classifyFabric({ imageBase64, mediaType, dimensions, weightKg, preferredSize }) {
   const dimensionText = dimensions
