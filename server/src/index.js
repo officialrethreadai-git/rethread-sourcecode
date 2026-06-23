@@ -12,7 +12,9 @@ import adminRouter from "./routes/admin.js";
 import accountsRouter from "./routes/accounts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const staticDir = path.join(__dirname, "../../frontend");
+// Support both local dev (../../frontend) and Render (RENDER sets cwd to repo root via start cmd)
+const staticDir = process.env.STATIC_DIR
+  || path.join(__dirname, "../../frontend");
 
 const app = express();
 app.use(cors());
@@ -42,7 +44,13 @@ app.use("/api/accounts", accountsRouter);
 
 app.use(express.static(staticDir));
 
+// SPA catch-all: any non-API path serves index.html
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(staticDir, "index.html"));
+});
+
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log(`ReThread AI server running on http://localhost:${port}`);
+  console.log(`Serving static files from: ${staticDir}`);
 });
