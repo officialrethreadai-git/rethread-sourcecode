@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReThread AI - Turn Textile Waste Into Wealth</title>
+  <meta name="description"
+    content="Snap a photo of fabric scraps. Our AI matches them with premium designs and buyers instantly. Reduce textile waste and earn.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              DEFAULT: '#F6F4EB', // Premium Warm Linen Beige
+              light: '#FAF9F5', // Creamy Warm White
+              dark: '#EAE5D8', // Warm Sand Beige
+              card: 'rgba(255, 255, 255, 0.45)', // Translucent Light Card
+            },
+            mint: {
+              DEFAULT: '#3D5A42', // Rich Sustainable Olive Green
+              light: '#557A5C', // Light Olive
+              dark: '#293C2C', // Deep Forest Green
+              glow: 'rgba(61, 90, 66, 0.12)',
+            },
+            offwhite: {
+              DEFAULT: '#1A1816', // Dark Charcoal/Brown Headings
+              dark: '#3A3530', // Warm Gray Body Text
+              muted: '#6B655F', // Muted Warm Gray/Brown
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 4s ease-in-out infinite',
+            'scan': 'scan 2s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            scan: {
+              '0%, 100%': { top: '0%' },
+              '50%': { top: '100%' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style type="text/css">
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #F6F4EB;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3D5A42;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #557A5C;
+    }
+
+    /* Premium Glassmorphism utility */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 25px 50px -12px rgba(120, 110, 90, 0.08);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .glass-input:focus {
+      border-color: #3D5A42;
+      box-shadow: 0 0 12px rgba(61, 90, 66, 0.25);
+      outline: none;
+    }
+
+    /* Scanner effect animation line */
+    .scan-line {
+      box-shadow: 0 0 15px 4px #3D5A42;
+    }
+
+    /* Tab active transitions */
+    .tab-active {
+      color: #3D5A42;
+      border-bottom: 2px solid #3D5A42;
+      background: linear-gradient(to top, rgba(61, 90, 66, 0.08), transparent);
+    }
+
+    /* ===== CSS TAB SWITCHING — no JS display needed ===== */
+    /* By default show landing, hide dashboard */
+    #landing-page-container {
+      display: block;
+    }
+
+    #creator-dashboard-container {
+      display: none;
+    }
+
+    /* When main has data-tab="dashboard", flip them */
+    main[data-tab="dashboard"] #landing-page-container {
+      display: none;
+    }
+
+    main[data-tab="dashboard"] #creator-dashboard-container {
+      display: block;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-forest font-sans text-offwhite min-h-screen flex flex-col selection:bg-mint selection:text-forest overflow-x-hidden">
+
+  <!-- SOFT RADIAL GLOWS DECORATIONS -->
+  <div
+    class="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full pointer-events-none z-0 opacity-40 blur-[150px]"
+    style="background: radial-gradient(circle, rgba(234, 229, 216, 0.7) 0%, rgba(246, 244, 235, 0.2) 70%, transparent 100%);">
+  </div>
+  <div
+    class="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full pointer-events-none z-0 opacity-30 blur-[150px]"
+    style="background: radial-gradient(circle, rgba(97, 122, 97, 0.1) 0%, rgba(246, 244, 235, 0.1) 70%, transparent 100%);">
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-50 w-full bg-forest/75 backdrop-blur-md border-b border-black/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="#" onclick="switchTab('landing'); return false;" class="flex items-center gap-2 group">
+          <div
+            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-mint to-mint-light flex items-center justify-center shadow-lg shadow-mint/20 group-hover:scale-105 transition-all shrink-0">
+            <!-- Intertwined ReThread Spool / Recycling Loop Logo -->
+            <svg class="w-5.5 h-5.5 sm:w-6 sm:h-6 text-forest" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 0 1 10 10v1a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-1A10 10 0 0 1 12 2z" />
+              <path d="M12 6a6 6 0 0 1 6 6v1" />
+              <path d="M6 13v-1a6 6 0 0 1 6-6" />
+              <circle cx="12" cy="12" r="2" fill="currentColor" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span
+              class="font-display font-bold text-base sm:text-lg tracking-tight text-offwhite group-hover:text-mint transition-colors">ReThread<span
+                class="text-mint">.ai</span></span>
+            <span class="text-[9px] uppercase tracking-widest text-offwhite-muted -mt-1 hidden sm:block">Sustainable
+              Fashion Hub</span>
+          </div>
+        </a>
+
+        <!-- TAB NAVIGATION BAR -->
+        <nav class="flex h-full space-x-0.5 sm:space-x-1" aria-label="Tabs">
+          <button id="tab-landing-btn" onclick="switchTab('landing')"
+            class="px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span class="hidden xs:inline sm:inline">Landing Page</span>
+            <span class="xs:hidden sm:hidden">Home</span>
+          </button>
+
+          <button id="tab-dashboard-btn" onclick="switchTab('dashboard')"
+            class="px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all relative">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+            </svg>
+            <span class="hidden xs:inline sm:inline">Creator Dashboard</span>
+            <span class="xs:hidden sm:hidden">Dashboard</span>
+            <span class="absolute top-3 sm:top-2 right-1.5 sm:right-2 flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-mint"></span>
+            </span>
+          </button>
+        </nav>
+
+        <!-- Social / CTA Header Button -->
+        <div class="hidden md:flex items-center">
+          <a href="https://github.com" target="_blank"
+            class="p-2 text-offwhite-muted hover:text-mint transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE CONTAINER -->
+  <main id="main-content" data-tab="landing" class="flex-grow z-10 relative">
+
+    <!-- ============================================== -->
+    <!-- 1. LANDING PAGE TAB CONTAINER -->
+    <!-- ============================================== -->
+    <div id="landing-page-container"
+      class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-20 md:space-y-24">
+
+      <!-- HERO SECTION -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+        <!-- Hero Text & Waitlist Sign-up -->
+        <div class="lg:col-span-7 space-y-8 text-center lg:text-left relative z-10">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mint/10 border border-mint/20 text-mint text-xs font-semibold tracking-wider uppercase">
+            <span class="flex h-2 w-2 rounded-full bg-mint"></span>
+            AI-Powered Sustainable Textiles
+          </div>
+
+          <h1
+            class="font-display font-extrabold text-4xl sm:text-5xl lg:text-7xl tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-offwhite to-offwhite-dark">
+            Turn Textile Waste <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-mint via-mint-light to-mint-dark">
+              Into Wealth
+            </span>
+          </h1>
+
+          <p class="text-offwhite-muted text-base sm:text-lg max-w-xl mx-auto lg:mx-0">
+            Snap a photo of fabric scraps. Our advanced AI model instantly scans fibers, matches them with premium
+            eco-friendly designs, and connects you directly with sustainable buyers.
+          </p>
+
+          <!-- Email signup box -->
+          <div class="max-w-md mx-auto lg:mx-0">
+            <form id="waitlist-form" onsubmit="handleWaitlistSubmit(event)" class="space-y-4">
+              <div
+                class="flex flex-col sm:flex-row items-center p-1.5 rounded-2xl sm:rounded-full border border-black/10 bg-white/60 backdrop-blur-md shadow-lg shadow-stone-200/50 focus-within:border-mint/50 focus-within:ring-1 focus-within:ring-mint/30 transition-all duration-300 gap-2 sm:gap-0">
+                <div class="pl-4 hidden sm:flex items-center pointer-events-none text-slate-400">
+                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </div>
+                <input type="email" id="waitlist-email" required placeholder="Enter your email address"
+                  class="w-full pl-4 sm:pl-3 pr-4 py-2.5 sm:py-2 bg-transparent text-offwhite placeholder-stone-400 focus:outline-none text-sm border-none rounded-xl text-center sm:text-left">
+                <button type="submit"
+                  class="w-full sm:w-auto bg-mint hover:bg-mint-light text-forest font-bold px-6 py-3 sm:py-2.5 rounded-xl sm:rounded-full transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0 group shadow-lg shadow-stone-200/20">
+                  <span>Join Waitlist</span>
+                  <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </div>
+              <p class="text-xs text-offwhite-muted pl-1 sm:pl-4">Join 3,400+ creators, designers, and circular mills
+                waiting for the beta launch.</p>
+            </form>
+
+            <!-- Waitlist Success Msg -->
+            <div id="waitlist-success"
+              class="hidden animate-fade-in glass-panel border-mint/30 p-4 rounded-2xl flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-mint/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div class="text-left">
+                <h4 class="font-bold text-sm text-offwhite">You're on the list!</h4>
+                <p class="text-xs text-offwhite-muted">We've saved your spot. Watch your inbox for early beta details.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Interactive Scanner UI Graphic Mockup -->
+        <div class="lg:col-span-5 flex justify-center relative">
+          <!-- Ambient card glow -->
+          <div
+            class="absolute -inset-4 bg-gradient-to-tr from-mint/15 to-transparent rounded-3xl blur-2xl -z-10 opacity-70">
+          </div>
+
+          <div
+            class="w-full max-w-sm glass-panel rounded-2xl relative shadow-xl shadow-stone-200/50 animate-float p-0 overflow-hidden">
+
+            <!-- Beige Browser Wrapper Bar -->
+            <div
+              class="flex items-center justify-between px-4 py-3 bg-forest-dark border-b border-black/5 rounded-t-2xl">
+              <div class="flex items-center gap-1.5">
+                <span class="h-3 w-3 rounded-full bg-[#ef4444] opacity-80"></span>
+                <span class="h-3 w-3 rounded-full bg-[#fbbf24] opacity-80"></span>
+                <span class="h-3 w-3 rounded-full bg-mint opacity-80"></span>
+              </div>
+              <div
+                class="bg-white/40 border border-black/5 rounded-md px-4 py-1 text-[10px] font-mono text-offwhite-dark text-center truncate max-w-[180px]">
+                rethread.ai/engine_v2.8
+              </div>
+              <div class="w-[45px]"></div> <!-- balancing space spacer -->
+            </div>
+
+            <!-- Content Area inside Mockup -->
+            <div class="p-6 space-y-4">
+              <!-- Scanner Display Frame -->
+              <div
+                class="relative rounded-2xl overflow-hidden aspect-[4/3] border border-black/5 flex items-center justify-center">
+
+                <img
+                  src="img.jpg"
+                  class="absolute inset-0 w-full h-full object-cover z-0" alt="Scanned Fabric">
+
+                <!-- Fabric scanning line overlay/digital nodes SVG -->
+                <svg class="w-full h-full object-cover absolute inset-0 z-10 pointer-events-none" viewBox="0 0 100 100"
+                  preserveAspectRatio="none">
+                  <defs>
+                    <pattern id="fineGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+                      <path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(61, 90, 66, 0.15)" stroke-width="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#fineGrid)" />
+
+                  <!-- Textile fibers nodes representation -->
+                  <circle cx="30" cy="22" r="3" fill="#3D5A42" opacity="0.8" class="animate-pulse-slow" />
+                  <circle cx="60" cy="45" r="4" fill="#3D5A42" opacity="0.8" />
+                  <circle cx="75" cy="70" r="3" fill="#3D5A42" opacity="0.8" class="animate-pulse-slow" />
+
+                  <!-- Connections -->
+                  <line x1="30" y1="22" x2="60" y2="45" stroke="rgba(61, 90, 66, 0.3)" stroke-width="0.75" />
+                  <line x1="60" y1="45" x2="75" y2="70" stroke="rgba(61, 90, 66, 0.3)" stroke-width="0.75" />
+                </svg>
+
+                <!-- Scan grid overlay -->
+                <div
+                  class="absolute inset-0 bg-gradient-to-b from-transparent via-mint/5 to-transparent pointer-events-none z-10">
+                </div>
+
+                <!-- Animated Scan Bar -->
+                <div
+                  class="absolute left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#3D5A42] to-transparent scan-line animate-scan z-10">
+                </div>
+
+                <!-- HUD info overlay -->
+                <div
+                  class="absolute bottom-3 left-3 right-3 bg-[#1A1816]/95 backdrop-blur-md border border-white/5 rounded-xl p-2.5 flex justify-between items-center z-20">
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-mint-light animate-pulse" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span class="text-[10px] font-mono tracking-wide text-white">ANALYZING WEAVE...</span>
+                  </div>
+                  <span class="text-[10px] font-mono font-bold text-mint-light">94.8% Match</span>
+                </div>
+              </div>
+
+              <!-- Analysis breakdown widgets below image inside card -->
+              <div class="space-y-3 pt-2">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-offwhite-muted font-medium">Detected Material</span>
+                  <span class="font-semibold text-offwhite flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-mint"></span> Cotton-Wool Blend
+                  </span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-offwhite-muted font-medium">Scrap Dimensions</span>
+                  <span class="font-semibold text-offwhite font-mono">0.65m x 0.48m</span>
+                </div>
+                <div class="pt-3 border-t border-black/5 flex items-center justify-between">
+                  <span class="text-[11px] text-mint font-semibold uppercase tracking-wider font-medium">Suggested
+                    Design</span>
+                  <span
+                    class="text-[11px] text-offwhite bg-white/40 border border-black/5 px-2.5 py-0.5 rounded-full font-medium">Patchwork
+                    Hat</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- FEATURES SECTION -->
+      <section class="space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <h2 class="font-display font-bold text-2xl sm:text-3xl text-offwhite">Intuitive Circular Fashion Ecosystem
+          </h2>
+          <p class="text-offwhite-muted text-sm sm:text-base">ReThread AI links up the entire waste lifecycle—converting
+            industrial leftovers and custom scraps into gorgeous designs.</p>
+        </div>
+
+        <!-- Grid of 3 Premium Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+          <!-- Feature Card 1: AI Scrap Analysis -->
+          <div
+            class="glass-panel p-6 sm:p-8 rounded-2xl relative hover:border-mint/30 hover:shadow-stone-200/40 hover:-translate-y-1 transition-all duration-300 group">
+            <div
+              class="w-12 h-12 rounded-xl bg-mint/15 border border-mint/20 flex items-center justify-center text-mint mb-6 group-hover:scale-110 transition-transform">
+              <!-- Camera Icon -->
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-xl text-offwhite mb-2">AI Scrap Analysis</h3>
+            <p class="text-offwhite-muted text-sm leading-relaxed">
+              Snap high-resolution photos of leftover fabrics. The computer vision model determines fiber type, weave
+              tightness, color grade, and precise surface measurements in seconds.
+            </p>
+          </div>
+
+          <!-- Feature Card 2: Smart Design Generator -->
+          <div
+            class="glass-panel p-6 sm:p-8 rounded-2xl relative hover:border-mint/30 hover:shadow-stone-200/40 hover:-translate-y-1 transition-all duration-300 group">
+            <div
+              class="w-12 h-12 rounded-xl bg-mint/15 border border-mint/20 flex items-center justify-center text-mint mb-6 group-hover:scale-110 transition-transform">
+              <!-- Sparkles Icon -->
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-xl text-offwhite mb-2">Smart Design Generator</h3>
+            <p class="text-offwhite-muted text-sm leading-relaxed">
+              Generates custom zero-waste clothing and accessory patterns. Instantly maps geometric blueprint shapes
+              directly onto the exact parameters of the scanned fabric scraps.
+            </p>
+          </div>
+
+          <!-- Feature Card 3: Eco-Designer Marketplace -->
+          <div
+            class="glass-panel p-6 sm:p-8 rounded-2xl relative hover:border-mint/30 hover:shadow-stone-200/40 hover:-translate-y-1 transition-all duration-300 group">
+            <div
+              class="w-12 h-12 rounded-xl bg-mint/15 border border-mint/20 flex items-center justify-center text-mint mb-6 group-hover:scale-110 transition-transform">
+              <!-- Shopping Bag Icon -->
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-xl text-offwhite mb-2">Eco-Designer Marketplace</h3>
+            <p class="text-offwhite-muted text-sm leading-relaxed">
+              Post fabric scrap scans directly onto our global supply board. Connect directly with designers looking to
+              source eco-responsible inputs or buy pre-patterned raw elements.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- IMPACT COUNTER SECTION -->
+      <section class="glass-panel rounded-2xl p-6 md:p-12 relative overflow-hidden">
+        <!-- Accent radial background wash -->
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full blur-[100px] pointer-events-none opacity-30"
+          style="background: radial-gradient(circle, rgba(61, 90, 66, 0.08) 0%, transparent 80%);"></div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative z-10 divide-y md:divide-y-0 md:divide-x divide-black/5">
+
+          <!-- Metric 1 -->
+          <div class="py-6 md:py-0 md:px-6">
+            <span class="block text-4xl sm:text-5xl font-display font-extrabold text-mint tracking-tight">12,000+</span>
+            <span class="block text-lg font-bold text-offwhite mt-2">Tons Saved</span>
+            <span class="block text-xs text-offwhite-muted mt-1">High-quality textiles diverted from Olusosun & regional
+              landfills</span>
+          </div>
+
+          <!-- Metric 2 -->
+          <div class="py-6 md:py-0 md:px-6">
+            <span class="block text-4xl sm:text-5xl font-display font-extrabold text-mint tracking-tight">1,500+</span>
+            <span class="block text-lg font-bold text-offwhite mt-2">Tailors Earning</span>
+            <span class="block text-xs text-offwhite-muted mt-1">Independent Nigerian tailors and makers monetizing
+              scraps</span>
+          </div>
+
+          <!-- Metric 3 -->
+          <div class="py-6 md:py-0 md:px-6">
+            <span class="block text-4xl sm:text-5xl font-display font-extrabold text-mint tracking-tight">45%</span>
+            <span class="block text-lg font-bold text-offwhite mt-2">Waste Reduced</span>
+            <span class="block text-xs text-offwhite-muted mt-1">Average workshop waste reduction per garment</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CALL TO ACTION / TRANSITION -->
+      <section class="text-center max-w-xl mx-auto space-y-6 relative px-4">
+        <div class="absolute inset-0 w-full h-full bg-mint/10 rounded-full blur-3xl -z-10"></div>
+        <h3 class="font-display font-bold text-2xl text-offwhite">Ready to test the prototype?</h3>
+        <p class="text-offwhite-muted text-sm">Skip the waitlist queue and experiment with the interactive AI matching
+          console instantly in the simulator dashboard.</p>
+        <button onclick="switchTab('dashboard')"
+          class="bg-mint hover:bg-mint-light text-forest font-extrabold px-8 py-4 rounded-full transition-all duration-300 transform active:scale-95 shadow-lg shadow-stone-200/20 flex items-center justify-center gap-2 mx-auto group">
+          <span>Go to Creator Dashboard</span>
+          <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </button>
+      </section>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 2. CREATOR DASHBOARD TAB CONTAINER (HIDDEN) -->
+    <!-- ============================================== -->
+    <div id="creator-dashboard-container" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+
+      <!-- Dashboard Heading & Simulation Banner -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 pb-6">
+        <div>
+          <div
+            class="inline-flex items-center gap-1 bg-mint/10 border border-mint/20 text-mint px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider mb-2">
+            PROTOTYPE SANDBOX
+          </div>
+          <h1 class="font-display font-bold text-3xl text-offwhite">Creator Dashboard</h1>
+          <p class="text-offwhite-muted text-sm">Upload scrap remnants, generate zero-waste templates, and monitor scrap
+            yields.</p>
+        </div>
+
+        <!-- Live status bar -->
+        <div
+          class="flex items-center gap-3 bg-white/60 px-4 py-2.5 rounded-full border border-black/5 text-xs backdrop-blur-sm shadow-md align-self-start md:align-self-auto">
+          <div class="h-2 w-2 rounded-full bg-mint animate-pulse"></div>
+          <span class="text-offwhite-muted font-mono">AI Server: <span class="text-offwhite font-semibold">Online
+              (12ms)</span></span>
+        </div>
+      </div>
+
+      <!-- TOP METRIC ROW -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+        <!-- Metric Box 1: Material Scanned -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 text-black/5 group-hover:scale-110 transition-transform">
+            <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Scrap Material Scanned</span>
+              <span id="metric-scanned-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">48.2
+                kg</span>
+            </div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">+14%</div>
+          </div>
+          <p class="text-[10px] text-offwhite-muted mt-2">Diverted from fabric scraps scrapbox since joining</p>
+        </div>
+
+        <!-- Metric Box 2: Generated Patterns -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 text-black/5 group-hover:scale-110 transition-transform">
+            <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+            </svg>
+          </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Generated Patterns</span>
+              <span id="metric-patterns-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">14
+                Drafts</span>
+            </div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">+3 new</div>
+          </div>
+          <p class="text-[10px] text-offwhite-muted mt-2">Zero-waste layouts optimized by ReThread engine</p>
+        </div>
+
+        <!-- Metric Box 3: Lifetime Revenue Earning -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-4 text-black/5 group-hover:scale-110 transition-transform">
+            <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Circular Revenue</span>
+              <span id="metric-revenue-qty"
+                class="block text-3xl font-display font-extrabold text-mint mt-1">₦480,000.00</span>
+            </div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">Active</div>
+          </div>
+          <p class="text-[10px] text-offwhite-muted mt-2">Pending payment validation for denim patchwork bundle</p>
+        </div>
+
+      </section>
+
+      <!-- MAIN SECTION: UPLOADER & SUGGESTIONS GALLERY -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- LEFT COLUMN: FABRIC SCRAP UPLOADER -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+            <h2 class="font-display font-bold text-lg text-offwhite mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Upload New Fabric Scrap
+            </h2>
+
+            <!-- DRAG & DROP / CLICK UPLOADER BOX -->
+            <div id="drop-zone"
+              class="border border-dashed border-black/10 hover:border-mint/50 rounded-2xl p-6 sm:p-8 text-center bg-white/40 hover:bg-white/60 cursor-pointer transition-all duration-300 relative group min-h-[220px] flex flex-col justify-center items-center">
+
+              <!-- File Input Element -->
+              <input type="file" id="file-uploader" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+
+              <!-- Static/Idle Uploader View -->
+              <div id="upload-idle-view" class="space-y-4">
+                <div
+                  class="w-12 h-12 rounded-full bg-mint/10 text-mint flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-offwhite">Drag & drop fabric photo here</p>
+                  <p class="text-xs text-offwhite-muted mt-1">Supports PNG, JPG, or HEIC up to 10MB</p>
+                </div>
+                <button type="button" onclick="triggerFileInput()"
+                  class="inline-flex items-center gap-1.5 bg-white/60 hover:bg-white/80 text-offwhite border border-black/5 text-xs px-4 py-2 rounded-full font-medium transition-all">
+                  Browse Files
+                </button>
+              </div>
+
+              <!-- Scanning animation overlay -->
+              <div id="upload-scanning-view"
+                class="hidden absolute inset-0 bg-forest/95 backdrop-blur-md border border-black/5 rounded-2xl flex flex-col justify-center items-center p-6 space-y-4 z-20">
+                <div
+                  class="w-full max-w-[200px] h-32 bg-forest-dark relative border border-black/5 rounded-xl overflow-hidden flex items-center justify-center">
+                  <!-- Simulated Selected Fabric preview -->
+                  <div id="fabric-scan-preview" class="absolute inset-0 opacity-80"></div>
+                  <!-- Green Line scan -->
+                  <div
+                    class="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-mint to-transparent scan-line animate-scan">
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-offwhite flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-mint" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                      </path>
+                    </svg>
+                    <span>AI Model Analyzing...</span>
+                  </h4>
+                  <p class="text-xs text-offwhite-muted mt-1 text-center font-medium">Reading weave patterns &
+                    calculating cutting shapes</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- FABRIC MEASUREMENTS INPUT -->
+            <div class="mt-4 grid grid-cols-3 gap-2">
+              <div>
+                <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Length
+                  (m)</label>
+                <input type="number" id="input-length" step="0.05" min="0" placeholder="0.60"
+                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+              </div>
+              <div>
+                <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Width
+                  (m)</label>
+                <input type="number" id="input-width" step="0.05" min="0" placeholder="0.50"
+                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+              </div>
+              <div>
+                <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Weight
+                  (kg)</label>
+                <input type="number" id="input-weight" step="0.1" min="0" placeholder="0.40"
+                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+              </div>
+            </div>
+
+            <!-- DEMO FABRIC PANEL -->
+            <div class="mt-6 border-t border-black/5 pt-4 space-y-3">
+              <span class="text-xs text-offwhite-muted font-bold block uppercase tracking-wider">No photo handy? Run
+                the live AI on our sample swatch:</span>
+              <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                <button onclick="runDemoFabric()"
+                  class="p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-mint/30 hover:border-mint/60 bg-mint/5 hover:bg-mint/10 text-left transition-all duration-300 flex flex-col justify-between h-16 sm:h-20 shadow-md">
+                  <span class="block text-[8px] sm:text-[10px] uppercase text-mint font-bold tracking-wider">Sample
+                    Ankara</span>
+                  <span class="block text-[8px] sm:text-[9px] text-offwhite-muted">Live AI scan</span>
+                </button>
+                <div
+                  class="p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-dashed border-black/10 bg-black/[0.02] text-left flex flex-col justify-between h-16 sm:h-20 opacity-60 cursor-not-allowed">
+                  <span
+                    class="block text-[8px] sm:text-[10px] uppercase text-offwhite-muted font-bold tracking-wider">Denim</span>
+                  <span class="block text-[8px] sm:text-[9px] text-offwhite-muted">Coming Soon</span>
+                </div>
+                <div
+                  class="p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-dashed border-black/10 bg-black/[0.02] text-left flex flex-col justify-between h-16 sm:h-20 opacity-60 cursor-not-allowed">
+                  <span
+                    class="block text-[8px] sm:text-[10px] uppercase text-offwhite-muted font-bold tracking-wider">Aso-Oke</span>
+                  <span class="block text-[8px] sm:text-[9px] text-offwhite-muted">Coming Soon</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RECYCLING MILL DIRECTORY MINI WIDGET -->
+          <div class="glass-panel p-6 rounded-2xl space-y-4">
+            <h3 class="font-display font-bold text-sm text-offwhite uppercase tracking-wider flex items-center gap-2">
+              <svg class="w-4.5 h-4.5 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Direct Circular Buyers
+            </h3>
+
+            <div class="space-y-3">
+              <!-- Buyer 1 -->
+              <div
+                class="flex justify-between items-center bg-white/40 p-3 rounded-2xl border border-black/5 text-xs hover:border-mint/25 transition-all duration-300 shadow-sm gap-2">
+                <div class="truncate">
+                  <h4 class="font-bold text-offwhite truncate">Lagos Circular Weaving</h4>
+                  <span class="text-offwhite-muted font-mono text-[9px] block truncate">Sourcing Denim & Adire
+                    Cottons</span>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="block text-mint font-bold">₦4,800 / kg</span>
+                  <span class="text-[9px] text-offwhite-muted">Yaba, Lagos</span>
+                </div>
+              </div>
+
+              <!-- Buyer 2 -->
+              <div
+                class="flex justify-between items-center bg-white/40 p-3 rounded-2xl border border-black/5 text-xs hover:border-mint/25 transition-all duration-300 shadow-sm gap-2">
+                <div class="truncate">
+                  <h4 class="font-bold text-offwhite truncate">Ikeja Green Atelier</h4>
+                  <span class="text-offwhite-muted font-mono text-[9px] block truncate">Sourcing Luxury Silks &
+                    Aso-Oke</span>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="block text-mint font-bold">₦18,750 / kg</span>
+                  <span class="text-[9px] text-offwhite-muted">Ikeja, Lagos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: SCROLLABLE GALLERY FEED (CONVERTED TO GRID) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h2 class="font-display font-bold text-lg text-offwhite">AI Design Suggestions for Your Leftover Material
+            </h2>
+            <div
+              class="flex items-center gap-1.5 text-xs text-mint bg-mint/10 border border-mint/20 px-3 py-1 rounded-full font-mono font-semibold self-start sm:self-auto">
+              <span id="gallery-count">0</span> Matches Available
+            </div>
+          </div>
+
+          <!-- LIVE SCAN SUMMARY (populated after a real /api/scan call) -->
+          <div id="scan-summary" class="hidden glass-panel p-4 rounded-2xl border-mint/20 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <span class="block text-offwhite-muted uppercase text-[9px] font-bold tracking-wider">Material</span>
+              <span id="scan-material" class="block text-offwhite font-semibold mt-0.5">—</span>
+            </div>
+            <div>
+              <span class="block text-offwhite-muted uppercase text-[9px] font-bold tracking-wider">Color</span>
+              <span id="scan-color" class="block text-offwhite font-semibold mt-0.5">—</span>
+            </div>
+            <div>
+              <span class="block text-offwhite-muted uppercase text-[9px] font-bold tracking-wider">Condition</span>
+              <span id="scan-condition" class="block text-offwhite font-semibold mt-0.5">—</span>
+            </div>
+            <div>
+              <span class="block text-offwhite-muted uppercase text-[9px] font-bold tracking-wider">Confidence</span>
+              <span id="scan-confidence" class="block text-mint font-bold mt-0.5">—</span>
+            </div>
+          </div>
+
+          <!-- GALLERY GRID FEED -->
+          <div id="gallery-feed" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div id="gallery-empty" class="sm:col-span-2 glass-panel p-8 rounded-2xl text-center">
+              <p class="text-sm text-offwhite-muted">Upload a fabric photo or run the live demo scan to see real AI
+                suggestions here.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- COMING SOON ROADMAP SECTION -->
+      <section class="space-y-5">
+        <div>
+          <h2 class="font-display font-bold text-lg text-offwhite">What's Coming Next</h2>
+          <p class="text-offwhite-muted text-sm">This prototype proves the core loop — scan, suggest, generate, list.
+            These are built next.</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="coming-soon-grid">
+          <!-- populated by JS from comingSoonFeatures -->
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- ACTION TOAST NOTIFICATIONS (POPUP) -->
+  <div id="toast-wrapper"
+    class="fixed bottom-6 left-1/2 sm:left-auto sm:right-6 -translate-x-1/2 sm:translate-x-0 z-50 flex flex-col gap-3 w-[calc(100%-2rem)] max-w-sm sm:w-auto pointer-events-none">
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-black/5 bg-forest-dark/90 py-8 relative z-10">
+    <div
+      class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-offwhite-muted">
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+        <span>© 2026 ReThread AI. Shaping a zero-waste textile future.</span>
+      </div>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-mint transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-mint transition-colors">Terms of Service</a>
+        <a href="#" class="hover:text-mint transition-colors">Sustainable Standards</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT SYSTEM CONTROLS -->
+  <!-- ============================================== -->
+  <script>
+    // ACTIVE TAB STATE
+    let activeTab = 'landing';
+
+    // INITIALIZE & STYLE ACTIVE TAB
+    function init() {
+      switchTab('landing');
+      renderComingSoonGrid();
+    }
+
+    // Same-origin: this file is served by the Express server alongside /api/*
+    const API_BASE = '';
+
+    // TAB NAVIGATION CONTROLLER
+    // Uses a pure CSS approach: sets data-tab on <main>.
+    // CSS rules in <style> handle show/hide — zero JS display juggling,
+    // zero Tailwind !important conflicts.
+    function switchTab(tabId) {
+      activeTab = tabId;
+
+      const main = document.getElementById('main-content');
+      const landingBtn = document.getElementById('tab-landing-btn');
+      const dashboardBtn = document.getElementById('tab-dashboard-btn');
+
+      // Flip the data attribute — CSS does the rest
+      main.setAttribute('data-tab', tabId);
+
+      if (tabId === 'landing') {
+        landingBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 font-medium text-xs sm:text-sm transition-all tab-active";
+        dashboardBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all relative";
+      } else {
+        landingBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all";
+        dashboardBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 font-medium text-xs sm:text-sm transition-all tab-active relative";
+      }
+
+      window.scrollTo(0, 0);
+    }
+
+    // WAITLIST SIGNUP HANDLER
+    function handleWaitlistSubmit(event) {
+      event.preventDefault();
+      const emailInput = document.getElementById('waitlist-email');
+      const successBlock = document.getElementById('waitlist-success');
+      const waitlistForm = document.getElementById('waitlist-form');
+
+      if (emailInput.value) {
+        waitlistForm.classList.add('hidden');
+        successBlock.classList.remove('hidden');
+        showToast('Successfully joined waitlist!', 'success');
+      }
+    }
+
+    // FILE UPLOAD
+    function triggerFileInput() {
+      document.getElementById('file-uploader').click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) runScan(file);
+    }
+
+    // DEMO FABRIC — uses the real bundled sample photo through the real AI pipeline
+    async function runDemoFabric() {
+      const lengthInput = document.getElementById('input-length');
+      const widthInput = document.getElementById('input-width');
+      const weightInput = document.getElementById('input-weight');
+      if (!lengthInput.value) lengthInput.value = '0.60';
+      if (!widthInput.value) widthInput.value = '0.50';
+      if (!weightInput.value) weightInput.value = '0.40';
+
+      const res = await fetch('img.jpg');
+      const blob = await res.blob();
+      const file = new File([blob], 'sample-ankara.jpg', { type: blob.type || 'image/jpeg' });
+      runScan(file);
+    }
+
+    // Per-scan and per-card state, so multiple scans/cards don't clobber each other
+    let scanCounter = 0;
+    const scanStore = {};
+    let cardCounter = 0;
+    const productStore = {};
+
+    // REAL SCAN: uploads to /api/scan, which calls Claude's vision API server-side
+    async function runScan(file) {
+      const idleView = document.getElementById('upload-idle-view');
+      const scanView = document.getElementById('upload-scanning-view');
+      const previewBox = document.getElementById('fabric-scan-preview');
+
+      const previewUrl = URL.createObjectURL(file);
+      previewBox.style.backgroundSize = 'cover';
+      previewBox.style.backgroundPosition = 'center';
+      previewBox.style.backgroundImage = `url(${previewUrl})`;
+
+      idleView.classList.add('hidden');
+      scanView.classList.remove('hidden');
+      showToast('Fabric scan sequence initiated', 'info');
+
+      const length = document.getElementById('input-length').value;
+      const width = document.getElementById('input-width').value;
+      const weightKg = document.getElementById('input-weight').value;
+      const dimensions = (length && width) ? `${length}m x ${width}m` : '';
+
+      const formData = new FormData();
+      formData.append('image', file);
+      if (dimensions) formData.append('dimensions', dimensions);
+      if (weightKg) formData.append('weightKg', weightKg);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/scan`, { method: 'POST', body: formData });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.detail || errBody.error || `Scan failed (${res.status})`);
+        }
+        const result = await res.json();
+
+        scanCounter += 1;
+        const scanId = `scan-${scanCounter}`;
+        scanStore[scanId] = { base64: result.sourceImageBase64, mediaType: result.sourceMediaType };
+
+        renderScanSummary(result);
+        (result.suggestedProducts || []).forEach((product) => addProductCard(product, scanId, result.materialType));
+        incrementMetrics(weightKg, (result.suggestedProducts || []).length);
+        showToast('Analysis complete — real AI suggestions added', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast(`Scan failed: ${err.message}`, 'error');
+      } finally {
+        scanView.classList.add('hidden');
+        idleView.classList.remove('hidden');
+      }
+    }
+
+    function renderScanSummary(result) {
+      document.getElementById('scan-summary').classList.remove('hidden');
+      document.getElementById('scan-material').textContent = result.materialType || '—';
+      document.getElementById('scan-color').textContent = result.colorProfile || '—';
+      document.getElementById('scan-condition').textContent = result.condition || '—';
+      document.getElementById('scan-confidence').textContent = result.confidencePercent ? `${result.confidencePercent}%` : '—';
+    }
+
+    // RENDER A SUGGESTION CARD FROM REAL AI OUTPUT (Naira formatting)
+    function addProductCard(product, scanId, materialType) {
+      document.getElementById('gallery-empty')?.remove();
+
+      cardCounter += 1;
+      const cardId = `card-${cardCounter}`;
+      productStore[cardId] = {
+        scanId,
+        name: product.name,
+        description: product.description,
+        valueNaira: product.estimatedValueNaira,
+        materialType,
+      };
+
+      const gallery = document.getElementById('gallery-feed');
+      const card = document.createElement('div');
+      card.id = cardId;
+      card.className = "glass-panel p-5 rounded-2xl hover:border-mint/20 transition-all flex flex-col justify-between gap-4 animate-fade-in relative group";
+      card.innerHTML = `
+          <div id="${cardId}-media" class="w-full h-36 rounded-xl bg-[#3D5A42]/5 border border-black/5 flex items-center justify-center shrink-0 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent"></div>
+            <svg class="w-14 h-14 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="absolute bottom-1.5 left-1.5 bg-[#1A1816]/80 backdrop-blur-sm text-white font-mono text-[8px] font-bold px-1.5 py-0.5 rounded border border-white/10">
+              ${product.yieldPercent != null ? product.yieldPercent + '% YIELD' : 'AI MATCH'}
+            </div>
+          </div>
+          <div class="flex-grow flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] text-mint font-bold uppercase tracking-wider font-mono font-semibold">Matched Scrap: ${(materialType || 'FABRIC').toUpperCase()}</span>
+              </div>
+              <h3 class="font-display font-bold text-base text-offwhite mt-1">${product.name}</h3>
+              <p class="text-xs text-offwhite-muted leading-relaxed mt-1">${product.description || ''}</p>
+            </div>
+            <div class="flex items-center justify-between border-t border-black/5 pt-3 mt-auto">
+              <span class="text-xs font-mono font-bold text-mint">₦${Number(product.estimatedValueNaira || 0).toLocaleString()} EST. VALUE</span>
+              <div class="flex gap-2">
+                <button id="${cardId}-gen" onclick="generateConcept('${cardId}')" class="text-xs bg-white/60 hover:bg-white/80 text-offwhite px-3 py-1.5 rounded-full font-medium border border-black/5 transition-all">
+                  Generate Image
+                </button>
+                <button onclick="listMarketplace('${cardId}')" class="text-xs bg-mint hover:bg-mint-light text-forest px-3.5 py-1.5 rounded-full font-bold transition-all shadow-md shadow-stone-200/20">
+                  List & Sell
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+      gallery.prepend(card);
+
+      const countEl = document.getElementById('gallery-count');
+      countEl.textContent = parseInt(countEl.textContent, 10) + 1;
+    }
+
+    // REAL CONCEPT IMAGE: sends the scrap photo + chosen product to /api/generate (fal.ai)
+    async function generateConcept(cardId) {
+      const product = productStore[cardId];
+      const scan = scanStore[product.scanId];
+      const btn = document.getElementById(`${cardId}-gen`);
+      const media = document.getElementById(`${cardId}-media`);
+      if (!product || !scan) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+      showToast('Rendering AI concept image via fal.ai…', 'info');
+
+      const wornByModel = /dress|top|jacket|gown|bandana|hat|scarf|wrap|shirt/i.test(product.name);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/generate`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            imageBase64: scan.base64,
+            mediaType: scan.mediaType,
+            productName: product.name,
+            productDescription: product.description,
+            wornByModel,
+          }),
+        });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.detail || errBody.error || `Generate failed (${res.status})`);
+        }
+        const { imageUrl } = await res.json();
+        product.imageUrl = imageUrl;
+        media.innerHTML = `<img src="${imageUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${product.name}">`;
+        btn.textContent = '✓ Image Ready';
+        showToast('Concept image generated', 'success');
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = 'Generate Image';
+        showToast(`Generation failed: ${err.message}`, 'error');
+      }
+    }
+
+    // REAL LISTING: persists to /api/marketplace (in-memory store on the server)
+    async function listMarketplace(cardId) {
+      const product = productStore[cardId];
+      if (!product) return;
+
+      const length = document.getElementById('input-length').value;
+      const width = document.getElementById('input-width').value;
+      const weightKg = document.getElementById('input-weight').value;
+
+      showToast(`Listing "${product.name}" on Circular Supply Board…`, 'info');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/marketplace`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            title: product.name,
+            materialType: product.materialType,
+            dimensions: (length && width) ? `${length}m x ${width}m` : null,
+            weightKg: weightKg ? Number(weightKg) : null,
+            priceNaira: product.valueNaira,
+            vendor: 'You',
+            imageUrl: product.imageUrl || null,
+          }),
+        });
+        if (!res.ok) throw new Error(`Listing failed (${res.status})`);
+        const listing = await res.json();
+
+        showToast(`Listed: "${listing.title}" for ₦${Number(listing.priceNaira).toLocaleString()}`, 'success');
+
+        const revEl = document.getElementById('metric-revenue-qty');
+        const currentRev = parseFloat(revEl.textContent.replace('₦', '').replace(/,/g, ''));
+        revEl.textContent = '₦' + (currentRev + listing.priceNaira).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } catch (err) {
+        console.error(err);
+        showToast(`Listing failed: ${err.message}`, 'error');
+      }
+    }
+
+    // UPDATE STATS COUNTER ACTION (driven by real weight input + real suggestion count)
+    function incrementMetrics(weightKg, patternCount) {
+      const scannedEl = document.getElementById('metric-scanned-qty');
+      const patternsEl = document.getElementById('metric-patterns-qty');
+
+      const oldWeight = parseFloat(scannedEl.textContent);
+      const addWeight = weightKg ? parseFloat(weightKg) : 0.5;
+      scannedEl.textContent = (oldWeight + addWeight).toFixed(1) + ' kg';
+
+      const oldPatterns = parseInt(patternsEl.textContent, 10);
+      patternsEl.textContent = (oldPatterns + patternCount) + ' Drafts';
+    }
+
+    // COMING SOON ROADMAP — from the business plan's future-feature list
+    const comingSoonFeatures = [
+      { name: 'AI Chat Assistant', desc: 'Ask "what can I make from these scraps?"' },
+      { name: 'Voice AI Assistant', desc: 'Speak directly to the AI assistant' },
+      { name: 'AI Pattern Generator', desc: 'Downloadable cutting patterns / DXF export' },
+      { name: 'Advanced Analytics', desc: 'Revenue & waste-reduction reports' },
+      { name: 'Supplier Verification', desc: 'Trusted-supplier badge' },
+      { name: 'Mobile App', desc: 'Android & iOS access' },
+      { name: 'Integrated Payments', desc: 'Pay and get paid inside the platform' },
+      { name: 'Notifications', desc: 'New buyer requests & order updates' },
+    ];
+
+    function renderComingSoonGrid() {
+      const grid = document.getElementById('coming-soon-grid');
+      if (!grid) return;
+      grid.innerHTML = comingSoonFeatures.map((f) => `
+        <div class="glass-panel p-4 rounded-2xl opacity-70 hover:opacity-100 transition-opacity">
+          <div class="w-9 h-9 rounded-lg bg-mint/10 border border-mint/20 flex items-center justify-center text-mint mb-3">
+            <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h4 class="font-display font-bold text-sm text-offwhite">${f.name}</h4>
+          <p class="text-[11px] text-offwhite-muted mt-1 leading-relaxed">${f.desc}</p>
+          <span class="inline-block mt-3 text-[9px] uppercase font-bold tracking-wider text-mint bg-mint/10 border border-mint/20 px-2 py-0.5 rounded-full">Coming Soon</span>
+        </div>
+      `).join('');
+    }
+
+    // TOAST NOTIFICATIONS HELPER
+    function showToast(message, type = 'info') {
+      const wrapper = document.getElementById('toast-wrapper');
+
+      const toast = document.createElement('div');
+      toast.className = "flex items-center gap-3 glass-panel px-4 py-3 rounded-2xl border border-black/5 shadow-2xl translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto min-w-[280px] max-w-sm";
+
+      let iconColor = 'text-mint';
+      let iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+
+      if (type === 'info') {
+        iconColor = 'text-blue-400';
+        iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+      } else if (type === 'error') {
+        iconColor = 'text-red-400';
+        iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>`;
+      }
+
+      toast.innerHTML = `
+          <div class="${iconColor}">
+            ${iconSvg}
+        </div>
+          <div class="text-xs text-offwhite font-semibold flex-grow">${message}</div>
+      `;
+
+      wrapper.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 3500);
+    }
+
+    // RUN ON LOAD — use DOMContentLoaded so the function runs before
+    // Tailwind CDN's deferred processing can interfere
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+
+</html>

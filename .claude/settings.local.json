@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm start *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -X POST http://localhost:4000/api/scan -F image=@landingpage-dashboard/img.jpg -F 'dimensions=0.6m x 0.5m' -F weightKg=0.4)",
+      "Bash(node --env-file=.env test_fetch.mjs)",
+      "Bash(npm view *)",
+      "Bash(node --env-file=.env test_sdk.mjs)",
+      "Bash(rm -f test_fetch.mjs test_sdk.mjs)",
+      "Bash(pkill -f \"node src/index.js\")",
+      "Bash(netstat -ano)",
+      "Bash(node test_generate.mjs)",
+      "Bash(curl -s -o /tmp/generated_sample.jpg \"https://v3b.fal.media/files/b/0a9f7726/rH0kt-NBW4Z840QQ1rI_A_7497154691a24851af392e5b98c23580.jpg\")",
+      "Bash(cygpath -w /tmp/generated_sample.jpg)",
+      "Bash(cd \"/c/Users/USER/Desktop/RethreadAi/server\" && rm -f test_generate.mjs)",
+      "Bash(node extract_check.mjs)",
+      "Bash(curl -s http://localhost:4000/)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(git credential *)",
+      "Bash(git remote *)",
+      "Bash(git ls-remote *)",
+      "Bash(echo \"exit code: $?\")"
+    ],
+    "additionalDirectories": [
+      "c:\\c\\Users\\USER\\Desktop\\RethreadAi\\server"
+    ]
+  }
+}
