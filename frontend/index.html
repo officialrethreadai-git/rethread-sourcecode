@@ -66,79 +66,16 @@
     }
   </script>
 
-  <style type="text/css">
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
+  <link rel="stylesheet" href="style.css">
 
-    ::-webkit-scrollbar-track {
-      background: #F6F4EB;
-    }
+  <!-- GSAP (scroll animations) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-    ::-webkit-scrollbar-thumb {
-      background: #3D5A42;
-      border-radius: 3px;
-    }
+  <!-- Three.js (decorative hero visual) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: #557A5C;
-    }
-
-    /* Premium Glassmorphism utility */
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.45);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 25px 50px -12px rgba(120, 110, 90, 0.08);
-    }
-
-    .glass-input {
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-
-    .glass-input:focus {
-      border-color: #3D5A42;
-      box-shadow: 0 0 12px rgba(61, 90, 66, 0.25);
-      outline: none;
-    }
-
-    /* Scanner effect animation line */
-    .scan-line {
-      box-shadow: 0 0 15px 4px #3D5A42;
-    }
-
-    /* Tab active transitions */
-    .tab-active {
-      color: #3D5A42;
-      border-bottom: 2px solid #3D5A42;
-      background: linear-gradient(to top, rgba(61, 90, 66, 0.08), transparent);
-    }
-
-    /* ===== CSS TAB SWITCHING — no JS display needed ===== */
-    /* By default show landing, hide dashboard */
-    #landing-page-container {
-      display: block;
-    }
-
-    #creator-dashboard-container {
-      display: none;
-    }
-
-    /* When main has data-tab="dashboard", flip them */
-    main[data-tab="dashboard"] #landing-page-container {
-      display: none;
-    }
-
-    main[data-tab="dashboard"] #creator-dashboard-container {
-      display: block;
-    }
-  </style>
+  
 </head>
 
 <body
@@ -181,36 +118,44 @@
           </div>
         </a>
 
-        <!-- TAB NAVIGATION BAR -->
-        <nav class="flex h-full space-x-0.5 sm:space-x-1" aria-label="Tabs">
+        <!-- TAB NAVIGATION BAR (desktop, md and up) -->
+        <nav class="hidden md:flex h-full space-x-0.5 sm:space-x-1" aria-label="Tabs">
           <button id="tab-landing-btn" onclick="switchTab('landing')"
-            class="px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all">
+            class="px-3 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all">
             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span class="hidden xs:inline sm:inline">Landing Page</span>
-            <span class="xs:hidden sm:hidden">Home</span>
+            <span>Landing Page</span>
           </button>
 
           <button id="tab-dashboard-btn" onclick="switchTab('dashboard')"
-            class="px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all relative">
+            class="px-3 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all relative">
             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
             </svg>
-            <span class="hidden xs:inline sm:inline">Creator Dashboard</span>
-            <span class="xs:hidden sm:hidden">Dashboard</span>
+            <span>Creator Dashboard</span>
             <span class="absolute top-3 sm:top-2 right-1.5 sm:right-2 flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-mint"></span>
             </span>
           </button>
+
+          <button id="tab-marketplace-btn" onclick="switchTab('marketplace')"
+            class="px-3 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span>Marketplace</span>
+          </button>
         </nav>
 
-        <!-- Social / CTA Header Button -->
+        <!-- Social / CTA Header Button (desktop) -->
         <div class="hidden md:flex items-center">
           <a href="https://github.com" target="_blank"
             class="p-2 text-offwhite-muted hover:text-mint transition-colors">
@@ -221,9 +166,70 @@
           </a>
         </div>
 
+        <!-- Hamburger trigger (mobile only, below md) -->
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false"
+          class="md:hidden sc-btn sc-btn-ghost sc-btn-sm !p-2">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
       </div>
     </div>
   </header>
+
+  <!-- MOBILE NAV SHEET (hamburger menu, below md) -->
+  <div id="mobile-menu-overlay" onclick="closeMobileMenu()" class="md:hidden fixed inset-0 z-[60] bg-black/40"></div>
+  <div id="mobile-menu-panel"
+    class="md:hidden fixed top-0 right-0 z-[70] h-full w-[78%] max-w-xs bg-forest border-l border-black/10 shadow-2xl flex flex-col">
+    <div class="flex items-center justify-between h-16 px-4 border-b border-black/5">
+      <span class="font-display font-bold text-sm text-offwhite">Menu</span>
+      <button onclick="closeMobileMenu()" aria-label="Close menu" class="sc-btn sc-btn-ghost sc-btn-sm !p-2">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <nav class="flex flex-col gap-1 p-3" aria-label="Mobile tabs">
+      <button id="mobile-tab-landing-btn" onclick="switchTab('landing'); closeMobileMenu()"
+        class="sc-btn sc-btn-ghost !justify-start !text-sm w-full">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Landing Page
+      </button>
+      <button id="mobile-tab-dashboard-btn" onclick="switchTab('dashboard'); closeMobileMenu()"
+        class="sc-btn sc-btn-ghost !justify-start !text-sm w-full relative">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+        </svg>
+        Creator Dashboard
+        <span class="ml-auto flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-mint opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-mint"></span>
+        </span>
+      </button>
+      <button id="mobile-tab-marketplace-btn" onclick="switchTab('marketplace'); closeMobileMenu()"
+        class="sc-btn sc-btn-ghost !justify-start !text-sm w-full">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        Marketplace
+      </button>
+    </nav>
+    <div class="mt-auto p-4 border-t border-black/5">
+      <a href="https://github.com" target="_blank" class="sc-btn sc-btn-outline sc-btn-sm w-full">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+        </svg>
+        View on GitHub
+      </a>
+    </div>
+  </div>
 
   <!-- MAIN SCROLLABLE CONTAINER -->
   <main id="main-content" data-tab="landing" class="flex-grow z-10 relative">
@@ -235,7 +241,10 @@
       class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-20 md:space-y-24">
 
       <!-- HERO SECTION -->
-      <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative">
+
+        <!-- Decorative 3D background (Three.js) — purely visual, sits behind the text/mockup -->
+        <canvas id="hero-canvas" class="absolute inset-0 w-full h-full -z-10 opacity-60 pointer-events-none"></canvas>
 
         <!-- Hero Text & Waitlist Sign-up -->
         <div class="lg:col-span-7 space-y-8 text-center lg:text-left relative z-10">
@@ -272,7 +281,7 @@
                 <input type="email" id="waitlist-email" required placeholder="Enter your email address"
                   class="w-full pl-4 sm:pl-3 pr-4 py-2.5 sm:py-2 bg-transparent text-offwhite placeholder-stone-400 focus:outline-none text-sm border-none rounded-xl text-center sm:text-left">
                 <button type="submit"
-                  class="w-full sm:w-auto bg-mint hover:bg-mint-light text-forest font-bold px-6 py-3 sm:py-2.5 rounded-xl sm:rounded-full transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0 group shadow-lg shadow-stone-200/20">
+                  class="sc-btn sc-btn-primary w-full sm:w-auto shrink-0 group">
                   <span>Join Waitlist</span>
                   <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -520,7 +529,7 @@
         <p class="text-offwhite-muted text-sm">Skip the waitlist queue and experiment with the interactive AI matching
           console instantly in the simulator dashboard.</p>
         <button onclick="switchTab('dashboard')"
-          class="bg-mint hover:bg-mint-light text-forest font-extrabold px-8 py-4 rounded-full transition-all duration-300 transform active:scale-95 shadow-lg shadow-stone-200/20 flex items-center justify-center gap-2 mx-auto group">
+          class="sc-btn sc-btn-primary sc-btn-lg mx-auto group">
           <span>Go to Creator Dashboard</span>
           <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none"
             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -572,12 +581,12 @@
           <div class="flex justify-between items-start">
             <div>
               <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Scrap Material Scanned</span>
-              <span id="metric-scanned-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">48.2
+              <span id="metric-scanned-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">0.0
                 kg</span>
             </div>
-            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">+14%</div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">Live</div>
           </div>
-          <p class="text-[10px] text-offwhite-muted mt-2">Diverted from fabric scraps scrapbox since joining</p>
+          <p class="text-[10px] text-offwhite-muted mt-2">Diverted from fabric scraps scrapbox this session</p>
         </div>
 
         <!-- Metric Box 2: Generated Patterns -->
@@ -591,12 +600,12 @@
           <div class="flex justify-between items-start">
             <div>
               <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Generated Patterns</span>
-              <span id="metric-patterns-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">14
+              <span id="metric-patterns-qty" class="block text-3xl font-display font-extrabold text-offwhite mt-1">0
                 Drafts</span>
             </div>
-            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">+3 new</div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">Live</div>
           </div>
-          <p class="text-[10px] text-offwhite-muted mt-2">Zero-waste layouts optimized by ReThread engine</p>
+          <p class="text-[10px] text-offwhite-muted mt-2">Zero-waste suggestions from the AI this session</p>
         </div>
 
         <!-- Metric Box 3: Lifetime Revenue Earning -->
@@ -612,11 +621,11 @@
             <div>
               <span class="text-xs text-offwhite-muted uppercase font-bold tracking-wider">Circular Revenue</span>
               <span id="metric-revenue-qty"
-                class="block text-3xl font-display font-extrabold text-mint mt-1">₦480,000.00</span>
+                class="block text-3xl font-display font-extrabold text-mint mt-1">₦0.00</span>
             </div>
-            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">Active</div>
+            <div class="p-2 rounded-lg bg-mint/10 text-mint text-xs font-semibold">Live</div>
           </div>
-          <p class="text-[10px] text-offwhite-muted mt-2">Pending payment validation for denim patchwork bundle</p>
+          <p class="text-[10px] text-offwhite-muted mt-2">Estimated value of items listed this session</p>
         </div>
 
       </section>
@@ -656,8 +665,7 @@
                   <p class="text-sm font-semibold text-offwhite">Drag & drop fabric photo here</p>
                   <p class="text-xs text-offwhite-muted mt-1">Supports PNG, JPG, or HEIC up to 10MB</p>
                 </div>
-                <button type="button" onclick="triggerFileInput()"
-                  class="inline-flex items-center gap-1.5 bg-white/60 hover:bg-white/80 text-offwhite border border-black/5 text-xs px-4 py-2 rounded-full font-medium transition-all">
+                <button type="button" onclick="event.stopPropagation(); triggerFileInput()" class="sc-btn sc-btn-outline sc-btn-sm">
                   Browse Files
                 </button>
               </div>
@@ -684,31 +692,37 @@
                     </svg>
                     <span>AI Model Analyzing...</span>
                   </h4>
-                  <p class="text-xs text-offwhite-muted mt-1 text-center font-medium">Reading weave patterns &
+                  <p id="scan-status-text" class="text-xs text-offwhite-muted mt-1 text-center font-medium">Reading weave patterns &
                     calculating cutting shapes</p>
                 </div>
               </div>
             </div>
 
             <!-- FABRIC MEASUREMENTS INPUT -->
-            <div class="mt-4 grid grid-cols-3 gap-2">
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
               <div>
                 <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Length
                   (m)</label>
                 <input type="number" id="input-length" step="0.05" min="0" placeholder="0.60"
-                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+                  class="sc-input px-3 py-2 text-xs">
               </div>
               <div>
                 <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Width
                   (m)</label>
                 <input type="number" id="input-width" step="0.05" min="0" placeholder="0.50"
-                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+                  class="sc-input px-3 py-2 text-xs">
               </div>
               <div>
                 <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Weight
                   (kg)</label>
                 <input type="number" id="input-weight" step="0.1" min="0" placeholder="0.40"
-                  class="w-full glass-input rounded-xl px-3 py-2 text-xs text-offwhite">
+                  class="sc-input px-3 py-2 text-xs">
+              </div>
+              <div>
+                <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Your Size
+                  <span class="normal-case font-medium text-offwhite-muted/70">(optional)</span></label>
+                <input type="text" id="input-size" placeholder="e.g. Medium"
+                  class="sc-input px-3 py-2 text-xs">
               </div>
             </div>
 
@@ -838,6 +852,37 @@
       </section>
     </div>
 
+    <!-- ============================================== -->
+    <!-- 3. MARKETPLACE TAB CONTAINER (HIDDEN) -->
+    <!-- ============================================== -->
+    <div id="marketplace-container" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 pb-6">
+        <div>
+          <div
+            class="inline-flex items-center gap-1 bg-mint/10 border border-mint/20 text-mint px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider mb-2">
+            PROTOTYPE SANDBOX
+          </div>
+          <h1 class="font-display font-bold text-3xl text-offwhite">Circular Supply Marketplace</h1>
+          <p class="text-offwhite-muted text-sm">Browse real listings posted from the Creator Dashboard — this is
+            live data from the server, not a mockup.</p>
+        </div>
+        <button onclick="loadMarketplace()" class="sc-btn sc-btn-outline sc-btn-sm self-start md:self-auto">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
+      </div>
+
+      <div id="marketplace-grid" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+        <div id="marketplace-loading" class="col-span-2 lg:col-span-3 glass-panel p-8 rounded-2xl text-center">
+          <p class="text-sm text-offwhite-muted">Loading listings…</p>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ACTION TOAST NOTIFICATIONS (POPUP) -->
@@ -867,370 +912,7 @@
   <!-- ============================================== -->
   <!-- JAVASCRIPT SYSTEM CONTROLS -->
   <!-- ============================================== -->
-  <script>
-    // ACTIVE TAB STATE
-    let activeTab = 'landing';
-
-    // INITIALIZE & STYLE ACTIVE TAB
-    function init() {
-      switchTab('landing');
-      renderComingSoonGrid();
-    }
-
-    // Same-origin: this file is served by the Express server alongside /api/*
-    const API_BASE = '';
-
-    // TAB NAVIGATION CONTROLLER
-    // Uses a pure CSS approach: sets data-tab on <main>.
-    // CSS rules in <style> handle show/hide — zero JS display juggling,
-    // zero Tailwind !important conflicts.
-    function switchTab(tabId) {
-      activeTab = tabId;
-
-      const main = document.getElementById('main-content');
-      const landingBtn = document.getElementById('tab-landing-btn');
-      const dashboardBtn = document.getElementById('tab-dashboard-btn');
-
-      // Flip the data attribute — CSS does the rest
-      main.setAttribute('data-tab', tabId);
-
-      if (tabId === 'landing') {
-        landingBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 font-medium text-xs sm:text-sm transition-all tab-active";
-        dashboardBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all relative";
-      } else {
-        landingBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 border-transparent font-medium text-xs sm:text-sm text-offwhite-muted hover:text-offwhite transition-all";
-        dashboardBtn.className = "px-2 sm:px-6 h-full flex items-center gap-1.5 border-b-2 font-medium text-xs sm:text-sm transition-all tab-active relative";
-      }
-
-      window.scrollTo(0, 0);
-    }
-
-    // WAITLIST SIGNUP HANDLER
-    function handleWaitlistSubmit(event) {
-      event.preventDefault();
-      const emailInput = document.getElementById('waitlist-email');
-      const successBlock = document.getElementById('waitlist-success');
-      const waitlistForm = document.getElementById('waitlist-form');
-
-      if (emailInput.value) {
-        waitlistForm.classList.add('hidden');
-        successBlock.classList.remove('hidden');
-        showToast('Successfully joined waitlist!', 'success');
-      }
-    }
-
-    // FILE UPLOAD
-    function triggerFileInput() {
-      document.getElementById('file-uploader').click();
-    }
-
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) runScan(file);
-    }
-
-    // DEMO FABRIC — uses the real bundled sample photo through the real AI pipeline
-    async function runDemoFabric() {
-      const lengthInput = document.getElementById('input-length');
-      const widthInput = document.getElementById('input-width');
-      const weightInput = document.getElementById('input-weight');
-      if (!lengthInput.value) lengthInput.value = '0.60';
-      if (!widthInput.value) widthInput.value = '0.50';
-      if (!weightInput.value) weightInput.value = '0.40';
-
-      const res = await fetch('img.jpg');
-      const blob = await res.blob();
-      const file = new File([blob], 'sample-ankara.jpg', { type: blob.type || 'image/jpeg' });
-      runScan(file);
-    }
-
-    // Per-scan and per-card state, so multiple scans/cards don't clobber each other
-    let scanCounter = 0;
-    const scanStore = {};
-    let cardCounter = 0;
-    const productStore = {};
-
-    // REAL SCAN: uploads to /api/scan, which calls Claude's vision API server-side
-    async function runScan(file) {
-      const idleView = document.getElementById('upload-idle-view');
-      const scanView = document.getElementById('upload-scanning-view');
-      const previewBox = document.getElementById('fabric-scan-preview');
-
-      const previewUrl = URL.createObjectURL(file);
-      previewBox.style.backgroundSize = 'cover';
-      previewBox.style.backgroundPosition = 'center';
-      previewBox.style.backgroundImage = `url(${previewUrl})`;
-
-      idleView.classList.add('hidden');
-      scanView.classList.remove('hidden');
-      showToast('Fabric scan sequence initiated', 'info');
-
-      const length = document.getElementById('input-length').value;
-      const width = document.getElementById('input-width').value;
-      const weightKg = document.getElementById('input-weight').value;
-      const dimensions = (length && width) ? `${length}m x ${width}m` : '';
-
-      const formData = new FormData();
-      formData.append('image', file);
-      if (dimensions) formData.append('dimensions', dimensions);
-      if (weightKg) formData.append('weightKg', weightKg);
-
-      try {
-        const res = await fetch(`${API_BASE}/api/scan`, { method: 'POST', body: formData });
-        if (!res.ok) {
-          const errBody = await res.json().catch(() => ({}));
-          throw new Error(errBody.detail || errBody.error || `Scan failed (${res.status})`);
-        }
-        const result = await res.json();
-
-        scanCounter += 1;
-        const scanId = `scan-${scanCounter}`;
-        scanStore[scanId] = { base64: result.sourceImageBase64, mediaType: result.sourceMediaType };
-
-        renderScanSummary(result);
-        (result.suggestedProducts || []).forEach((product) => addProductCard(product, scanId, result.materialType));
-        incrementMetrics(weightKg, (result.suggestedProducts || []).length);
-        showToast('Analysis complete — real AI suggestions added', 'success');
-      } catch (err) {
-        console.error(err);
-        showToast(`Scan failed: ${err.message}`, 'error');
-      } finally {
-        scanView.classList.add('hidden');
-        idleView.classList.remove('hidden');
-      }
-    }
-
-    function renderScanSummary(result) {
-      document.getElementById('scan-summary').classList.remove('hidden');
-      document.getElementById('scan-material').textContent = result.materialType || '—';
-      document.getElementById('scan-color').textContent = result.colorProfile || '—';
-      document.getElementById('scan-condition').textContent = result.condition || '—';
-      document.getElementById('scan-confidence').textContent = result.confidencePercent ? `${result.confidencePercent}%` : '—';
-    }
-
-    // RENDER A SUGGESTION CARD FROM REAL AI OUTPUT (Naira formatting)
-    function addProductCard(product, scanId, materialType) {
-      document.getElementById('gallery-empty')?.remove();
-
-      cardCounter += 1;
-      const cardId = `card-${cardCounter}`;
-      productStore[cardId] = {
-        scanId,
-        name: product.name,
-        description: product.description,
-        valueNaira: product.estimatedValueNaira,
-        materialType,
-      };
-
-      const gallery = document.getElementById('gallery-feed');
-      const card = document.createElement('div');
-      card.id = cardId;
-      card.className = "glass-panel p-5 rounded-2xl hover:border-mint/20 transition-all flex flex-col justify-between gap-4 animate-fade-in relative group";
-      card.innerHTML = `
-          <div id="${cardId}-media" class="w-full h-36 rounded-xl bg-[#3D5A42]/5 border border-black/5 flex items-center justify-center shrink-0 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent"></div>
-            <svg class="w-14 h-14 text-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <div class="absolute bottom-1.5 left-1.5 bg-[#1A1816]/80 backdrop-blur-sm text-white font-mono text-[8px] font-bold px-1.5 py-0.5 rounded border border-white/10">
-              ${product.yieldPercent != null ? product.yieldPercent + '% YIELD' : 'AI MATCH'}
-            </div>
-          </div>
-          <div class="flex-grow flex flex-col justify-between space-y-3">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] text-mint font-bold uppercase tracking-wider font-mono font-semibold">Matched Scrap: ${(materialType || 'FABRIC').toUpperCase()}</span>
-              </div>
-              <h3 class="font-display font-bold text-base text-offwhite mt-1">${product.name}</h3>
-              <p class="text-xs text-offwhite-muted leading-relaxed mt-1">${product.description || ''}</p>
-            </div>
-            <div class="flex items-center justify-between border-t border-black/5 pt-3 mt-auto">
-              <span class="text-xs font-mono font-bold text-mint">₦${Number(product.estimatedValueNaira || 0).toLocaleString()} EST. VALUE</span>
-              <div class="flex gap-2">
-                <button id="${cardId}-gen" onclick="generateConcept('${cardId}')" class="text-xs bg-white/60 hover:bg-white/80 text-offwhite px-3 py-1.5 rounded-full font-medium border border-black/5 transition-all">
-                  Generate Image
-                </button>
-                <button onclick="listMarketplace('${cardId}')" class="text-xs bg-mint hover:bg-mint-light text-forest px-3.5 py-1.5 rounded-full font-bold transition-all shadow-md shadow-stone-200/20">
-                  List & Sell
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-
-      gallery.prepend(card);
-
-      const countEl = document.getElementById('gallery-count');
-      countEl.textContent = parseInt(countEl.textContent, 10) + 1;
-    }
-
-    // REAL CONCEPT IMAGE: sends the scrap photo + chosen product to /api/generate (fal.ai)
-    async function generateConcept(cardId) {
-      const product = productStore[cardId];
-      const scan = scanStore[product.scanId];
-      const btn = document.getElementById(`${cardId}-gen`);
-      const media = document.getElementById(`${cardId}-media`);
-      if (!product || !scan) return;
-
-      btn.disabled = true;
-      btn.textContent = 'Generating…';
-      showToast('Rendering AI concept image via fal.ai…', 'info');
-
-      const wornByModel = /dress|top|jacket|gown|bandana|hat|scarf|wrap|shirt/i.test(product.name);
-
-      try {
-        const res = await fetch(`${API_BASE}/api/generate`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            imageBase64: scan.base64,
-            mediaType: scan.mediaType,
-            productName: product.name,
-            productDescription: product.description,
-            wornByModel,
-          }),
-        });
-        if (!res.ok) {
-          const errBody = await res.json().catch(() => ({}));
-          throw new Error(errBody.detail || errBody.error || `Generate failed (${res.status})`);
-        }
-        const { imageUrl } = await res.json();
-        product.imageUrl = imageUrl;
-        media.innerHTML = `<img src="${imageUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${product.name}">`;
-        btn.textContent = '✓ Image Ready';
-        showToast('Concept image generated', 'success');
-      } catch (err) {
-        console.error(err);
-        btn.disabled = false;
-        btn.textContent = 'Generate Image';
-        showToast(`Generation failed: ${err.message}`, 'error');
-      }
-    }
-
-    // REAL LISTING: persists to /api/marketplace (in-memory store on the server)
-    async function listMarketplace(cardId) {
-      const product = productStore[cardId];
-      if (!product) return;
-
-      const length = document.getElementById('input-length').value;
-      const width = document.getElementById('input-width').value;
-      const weightKg = document.getElementById('input-weight').value;
-
-      showToast(`Listing "${product.name}" on Circular Supply Board…`, 'info');
-
-      try {
-        const res = await fetch(`${API_BASE}/api/marketplace`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            title: product.name,
-            materialType: product.materialType,
-            dimensions: (length && width) ? `${length}m x ${width}m` : null,
-            weightKg: weightKg ? Number(weightKg) : null,
-            priceNaira: product.valueNaira,
-            vendor: 'You',
-            imageUrl: product.imageUrl || null,
-          }),
-        });
-        if (!res.ok) throw new Error(`Listing failed (${res.status})`);
-        const listing = await res.json();
-
-        showToast(`Listed: "${listing.title}" for ₦${Number(listing.priceNaira).toLocaleString()}`, 'success');
-
-        const revEl = document.getElementById('metric-revenue-qty');
-        const currentRev = parseFloat(revEl.textContent.replace('₦', '').replace(/,/g, ''));
-        revEl.textContent = '₦' + (currentRev + listing.priceNaira).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      } catch (err) {
-        console.error(err);
-        showToast(`Listing failed: ${err.message}`, 'error');
-      }
-    }
-
-    // UPDATE STATS COUNTER ACTION (driven by real weight input + real suggestion count)
-    function incrementMetrics(weightKg, patternCount) {
-      const scannedEl = document.getElementById('metric-scanned-qty');
-      const patternsEl = document.getElementById('metric-patterns-qty');
-
-      const oldWeight = parseFloat(scannedEl.textContent);
-      const addWeight = weightKg ? parseFloat(weightKg) : 0.5;
-      scannedEl.textContent = (oldWeight + addWeight).toFixed(1) + ' kg';
-
-      const oldPatterns = parseInt(patternsEl.textContent, 10);
-      patternsEl.textContent = (oldPatterns + patternCount) + ' Drafts';
-    }
-
-    // COMING SOON ROADMAP — from the business plan's future-feature list
-    const comingSoonFeatures = [
-      { name: 'AI Chat Assistant', desc: 'Ask "what can I make from these scraps?"' },
-      { name: 'Voice AI Assistant', desc: 'Speak directly to the AI assistant' },
-      { name: 'AI Pattern Generator', desc: 'Downloadable cutting patterns / DXF export' },
-      { name: 'Advanced Analytics', desc: 'Revenue & waste-reduction reports' },
-      { name: 'Supplier Verification', desc: 'Trusted-supplier badge' },
-      { name: 'Mobile App', desc: 'Android & iOS access' },
-      { name: 'Integrated Payments', desc: 'Pay and get paid inside the platform' },
-      { name: 'Notifications', desc: 'New buyer requests & order updates' },
-    ];
-
-    function renderComingSoonGrid() {
-      const grid = document.getElementById('coming-soon-grid');
-      if (!grid) return;
-      grid.innerHTML = comingSoonFeatures.map((f) => `
-        <div class="glass-panel p-4 rounded-2xl opacity-70 hover:opacity-100 transition-opacity">
-          <div class="w-9 h-9 rounded-lg bg-mint/10 border border-mint/20 flex items-center justify-center text-mint mb-3">
-            <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h4 class="font-display font-bold text-sm text-offwhite">${f.name}</h4>
-          <p class="text-[11px] text-offwhite-muted mt-1 leading-relaxed">${f.desc}</p>
-          <span class="inline-block mt-3 text-[9px] uppercase font-bold tracking-wider text-mint bg-mint/10 border border-mint/20 px-2 py-0.5 rounded-full">Coming Soon</span>
-        </div>
-      `).join('');
-    }
-
-    // TOAST NOTIFICATIONS HELPER
-    function showToast(message, type = 'info') {
-      const wrapper = document.getElementById('toast-wrapper');
-
-      const toast = document.createElement('div');
-      toast.className = "flex items-center gap-3 glass-panel px-4 py-3 rounded-2xl border border-black/5 shadow-2xl translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto min-w-[280px] max-w-sm";
-
-      let iconColor = 'text-mint';
-      let iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-
-      if (type === 'info') {
-        iconColor = 'text-blue-400';
-        iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-      } else if (type === 'error') {
-        iconColor = 'text-red-400';
-        iconSvg = `<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>`;
-      }
-
-      toast.innerHTML = `
-          <div class="${iconColor}">
-            ${iconSvg}
-        </div>
-          <div class="text-xs text-offwhite font-semibold flex-grow">${message}</div>
-      `;
-
-      wrapper.appendChild(toast);
-
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      });
-
-      setTimeout(() => {
-        toast.classList.add('translate-y-2', 'opacity-0');
-        setTimeout(() => {
-          toast.remove();
-        }, 300);
-      }, 3500);
-    }
-
-    // RUN ON LOAD — use DOMContentLoaded so the function runs before
-    // Tailwind CDN's deferred processing can interfere
-    document.addEventListener('DOMContentLoaded', init);
-  </script>
+  <script src="app.js"></script>
 </body>
 
 </html>

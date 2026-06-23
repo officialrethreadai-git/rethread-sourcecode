@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReThread AI — Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: { DEFAULT: '#F6F4EB', light: '#FAF9F5', dark: '#EAE5D8' },
+            mint: { DEFAULT: '#3D5A42', light: '#557A5C', dark: '#293C2C' },
+            offwhite: { DEFAULT: '#1A1816', dark: '#3A3530', muted: '#6B655F' },
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-forest font-sans text-offwhite min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="w-full max-w-sm glass-panel rounded-2xl p-6 sm:p-8 space-y-5">
+    <div>
+      <span class="sc-badge px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider">Admin Only</span>
+      <h1 class="font-display font-bold text-2xl text-offwhite mt-2">ReThread AI Admin</h1>
+      <p class="text-offwhite-muted text-sm mt-1">Sign in to view API credit balances.</p>
+    </div>
+    <form id="login-form" class="space-y-3">
+      <div>
+        <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Username</label>
+        <input type="text" id="login-username" required class="sc-input px-3 py-2 text-sm" autocomplete="username">
+      </div>
+      <div>
+        <label class="text-[10px] text-offwhite-muted font-bold uppercase tracking-wider block mb-1">Password</label>
+        <input type="password" id="login-password" required class="sc-input px-3 py-2 text-sm"
+          autocomplete="current-password">
+      </div>
+      <p id="login-error" class="hidden text-xs text-red-500"></p>
+      <button type="submit" class="sc-btn sc-btn-primary w-full">Sign In</button>
+    </form>
+  </div>
+
+  <!-- BALANCES VIEW (hidden until authenticated) -->
+  <div id="balances-view" class="hidden w-full max-w-3xl space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="sc-badge px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider">Admin Only</span>
+        <h1 class="font-display font-bold text-2xl text-offwhite mt-2">API Credit Balances</h1>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="loadBalances()" class="sc-btn sc-btn-outline sc-btn-sm">Refresh</button>
+        <button onclick="logout()" class="sc-btn sc-btn-ghost sc-btn-sm">Sign Out</button>
+      </div>
+    </div>
+
+    <div id="balances-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="glass-panel p-8 rounded-2xl text-center sm:col-span-2">
+        <p class="text-sm text-offwhite-muted">Loading…</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+
+</html>

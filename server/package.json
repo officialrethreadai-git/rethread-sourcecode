@@ -10,9 +10,11 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
     "@fal-ai/client": "^1.2.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-session": "^1.19.0",
     "multer": "^2.0.0"
   }
 }

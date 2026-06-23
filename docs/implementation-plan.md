@@ -13,18 +13,31 @@ Prototype/MVP for a pitch competition. Timeline: ~2 days.
 ## Current State (updated — see docs/STATUS.md for the live version)
 - Backend built and working: `server/` (Express, Node 24, ES modules).
   `/api/scan` (Claude Haiku 4.5 vision), `/api/generate` (fal.ai
-  flux-pro/kontext), `/api/marketplace` (in-memory) all tested end-to-end with
+  flux-pro/kontext, gated by admin approval), `/api/marketplace` (in-memory),
+  `/api/admin/*` (single super-admin login + real credit balances),
+  `/api/generate-access/*` (request/approve flow) all tested end-to-end with
   real keys and real responses.
-- `landingpage-dashboard/index.html` is wired to the real backend — no more
-  `setTimeout`/`mockPatterns`. The Express server also serves this file
-  statically, so the whole thing runs as one process on `http://localhost:4000`.
-- Dimension (length/width) and weight input fields added to the upload form.
+- `frontend/` (renamed from `landingpage-dashboard/`) is wired to the real
+  backend — no more `setTimeout`/`mockPatterns`. Split into
+  `index.html`/`style.css`/`app.js` (+ `admin.html`/`admin.js` for the admin
+  panel). The Express server serves the whole folder statically as one
+  process on `http://localhost:4000`.
+- Mobile-first responsive pass: hamburger nav sheet below `md`, 2-up
+  marketplace grid on mobile, hand-built shadcn-style component classes
+  (`sc-btn`/`sc-input`/`sc-badge`) for a flat, minimal look without a
+  React/Radix dependency.
+- Dimension (length/width/weight) + optional preferred-size input fields,
+  all flowing into both the Claude prompt and the fal.ai generation prompt.
 - A real bundled demo photo (`img.jpg`, Ankara print) runs through the actual
   AI pipeline via the "Sample Ankara" button — not a fake preset.
 - "Coming Soon" roadmap grid added to the dashboard, matching the business
   plan's future-features list, so nothing unbuilt is presented as real.
+- Image generation is gated: visitors request access, the admin (logged in
+  at `/admin.html`) approves/denies per-session — protects the low fal.ai
+  budget from being burned by random visitors during a public demo.
 - `docs/PLAIN-ENGLISH-GUIDE.md` + `.claude/skills/explain-build/` give a
   non-technical walkthrough of the actual current build.
+- `render.yaml` + `docs/DEPLOY.md` for a one-blueprint Render deploy.
 
 ## Architecture Decision
 The original advice (TensorFlow/MobileNet trained locally, SQLite, full

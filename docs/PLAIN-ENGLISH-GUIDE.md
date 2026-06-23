@@ -1,7 +1,9 @@
 # ReThread AI — Plain English Guide
 
-> For anyone explaining this demo who isn't a developer. No jargon. Run `/explain-build`
-> again any time the build changes and this should get refreshed to match.
+> For anyone explaining this demo who isn't a developer. No jargon. This is a
+> team/platoon project — everyone on the team should be able to read this and
+> explain the demo to a judge. Run `/explain-build` again any time the build
+> changes and this should get refreshed to match.
 
 ## What this is
 
@@ -14,44 +16,82 @@ them into something sellable.
 
 ## What happens when someone uses it, step by step
 
-1. You open the "Creator Dashboard" tab and either upload a photo of a fabric
-   scrap, or click the green "Sample Ankara" button to try it with a real demo
-   photo that's already loaded.
-2. You can optionally type in the scrap's length, width, and weight.
+1. You open the "Creator Dashboard" tab and either drag a fabric photo onto
+   the upload box (or click it / use "Browse Files"), or click the green
+   "Sample Ankara" button to try it with a real demo photo that's already
+   loaded.
+2. You can optionally type in the scrap's length, width, weight, and what
+   size garment you'd want (e.g. "Medium") — none of this is required.
 3. The photo gets sent to **Claude** (Anthropic's AI). Think of it like
-   showing the photo to an expert tailor who instantly tells you: what kind of
-   fabric it is, its color, its condition, and 2–3 things you could realistically
-   make from it, with an estimated naira value for each.
+   showing the photo to an expert tailor who instantly tells you: what kind
+   of fabric it is, its color, its condition, and 2–3 things you could
+   realistically make from it, with an estimated naira value for each. While
+   this is happening, the screen shows real status messages ("Checking fiber
+   type...", "Matching against zero-waste product ideas...") so it doesn't
+   look frozen.
 4. Those suggestions show up as cards on screen — this is real, not pretend.
-5. For any suggestion, you can click "Generate Image." This sends the original
-   fabric photo plus the chosen product idea to **fal.ai**, which is a
-   different AI that's good at drawing realistic product photos. It paints what
-   that tote bag / bandana / jacket would actually look like, made from your
-   exact fabric's color and pattern.
-6. You can click "List & Sell" to add that suggestion to the marketplace list
-   (currently just stored on the server while it's running — not a permanent
-   database yet).
+5. For any suggestion, you can click "Generate Image." This sends the
+   original fabric photo plus the chosen product idea (and your size, if you
+   gave one) to **fal.ai**, a different AI that draws realistic product
+   photos. It paints what that tote bag / bandana / dress would actually look
+   like, made from your exact fabric's color and pattern — on a model if it's
+   a wearable item, as a flat product shot otherwise.
+6. You can click "List & Sell" to add that suggestion to the Marketplace tab,
+   where anyone can browse real listings (not just post them).
+
+## Why you sometimes have to "request access" before generating an image
+
+The image-generating AI (fal.ai) costs real money every time it's used, and
+the team's remaining credit is small. So instead of letting any random
+visitor click "Generate Image" as many times as they want, the app asks
+first-time visitors to type their name and "request access." Someone with
+the admin login then approves or denies that specific person from the admin
+panel. Think of it like asking a manager to swipe the company card — it's not
+a bug, it's there on purpose to protect the budget during the live demo.
+Once approved, that person can generate images normally for the rest of
+their visit.
+
+## What the admin panel does (`/admin.html`)
+
+This is a separate, hidden page — it's not a tab in the main app, so casual
+visitors won't stumble onto it. Whoever holds the admin login (one shared
+username/password) can:
+- See the **real** remaining AI budget for both services: fal.ai shows an
+  actual live dollar balance; Claude doesn't have a "balance" feature at all
+  (Anthropic just doesn't offer that), so instead the panel shows real money
+  spent so far this month and an estimated amount left, clearly labeled as an
+  estimate.
+- See everyone who has clicked "request access" to generate images, and
+  approve or deny each one with a button.
+
+If either of these AI services runs out of money or its key stops working
+mid-demo, the app shows a clear message telling the visitor to contact the
+admin — it won't just silently break or show a confusing error.
 
 ## The two AI services we use, explained simply
 
-- **Claude (Anthropic)** — the "expert eye." It looks at a photo and tells you
-  what it's looking at, in words. We use it for the identification step.
+- **Claude (Anthropic)** — the "expert eye." It looks at a photo and tells
+  you what it's looking at, in words. We use it for the identification step.
 - **fal.ai** — the "AI artist." It doesn't identify things, it draws/generates
   images. We use it to turn a fabric photo into a picture of a finished
   product. They're two different specialists doing two different jobs, which
   is why the app uses both instead of just one.
 
 Both cost a small amount of money per use (fractions of a cent to a few cents
-each), paid for out of the $3 fal.ai credit and $5 Claude credit already set up.
+each). As of this write-up, fal.ai's real remaining balance is about $2.97 —
+genuinely low — which is exactly why the access-approval system above exists.
 
 ## What's real vs. what's still a placeholder
 
 **Real and working right now:**
-- Photo upload and the live demo button
-- Real AI fabric identification (Claude)
-- Real AI-generated product images (fal.ai)
+- Drag-and-drop (or click) photo upload, and the live demo button
+- Real AI fabric identification (Claude), including optional size input
+- Real AI-generated product images (fal.ai), gated by admin approval
 - A working server behind the website (not fake/simulated)
-- A basic marketplace list that listings get added to
+- A real, browsable Marketplace tab — not just a posting form
+- A real admin login with real AI credit numbers (or honest "can't check
+  that" messages — never a made-up number)
+- Friendly messages if AI credit runs out or a key stops working
 
 **Marked "Coming Soon" in the app — not built yet, don't claim these in a demo:**
 - AI Chat Assistant (chatting with the AI about your scraps)
@@ -59,11 +99,15 @@ each), paid for out of the $3 fal.ai credit and $5 Claude credit already set up.
 - AI Pattern Generator (downloadable sewing cut patterns / DXF files)
 - Advanced Analytics (revenue/waste reports)
 - Supplier Verification badges
-- Mobile app
-- Integrated payments (no real money moves through the app)
+- Mobile app (the website itself is mobile-friendly, but there's no
+  separate native app)
+- Integrated payments (no real money moves through the app — "Reserve" on a
+  marketplace listing is intentionally disabled)
 - Notifications system
-- A permanent database (right now, if the server restarts, listings reset —
-  fine for a demo, not for real users yet)
+- A permanent database (right now, if the server restarts, listings and
+  access requests reset — fine for a demo, not for real users yet)
+- Demo buttons for Denim and Aso-Oke fabric (disabled until real photos of
+  those fabrics are added — only the Ankara sample photo works right now)
 
 ## Words you might get asked about
 
@@ -73,9 +117,14 @@ each), paid for out of the $3 fal.ai credit and $5 Claude credit already set up.
   website "calls Claude," it's sending the photo over the internet to
   Anthropic's servers and getting an answer back.
 - **Backend / server** — the part of the app that does the work behind the
-  scenes (talking to the AI services, storing listings) — the part users don't
-  see directly.
+  scenes (talking to the AI services, storing listings, checking admin
+  logins) — the part users don't see directly.
 - **Endpoint** — one specific thing the backend can be asked to do, like "scan
   this photo" or "list this item for sale."
+- **Session** — how the website remembers it's still talking to the same
+  visitor between clicks (e.g. so it remembers you were approved for image
+  generation without you having to log in).
+- **Credit / balance** — prepaid money on an AI account that gets used up a
+  little bit each time the AI is called, like a phone recharge card.
 - **Prototype / MVP** — the first simple working version, which is what this
   is. It proves the idea works before investing in a polished, full version.

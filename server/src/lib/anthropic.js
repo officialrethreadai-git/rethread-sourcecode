@@ -16,11 +16,14 @@ const SYSTEM_PROMPT = `You are the textile analysis engine for ReThread AI, a Ni
 
 Suggest 2-3 suggestedProducts. Favor zero-waste, low-complexity products realistic for a small tailor to actually cut (tote bags, bucket hats, scarves, patchwork panels, bandanas) over full garments unless the scrap is clearly large enough. Recognize Nigerian fabric types (Ankara, Aso-Oke, Adire) when visible. If scrap dimensions or weight are provided, factor them into feasibility and the estimatedValueNaira.`;
 
-export async function classifyFabric({ imageBase64, mediaType, dimensions, weightKg }) {
+export async function classifyFabric({ imageBase64, mediaType, dimensions, weightKg, preferredSize }) {
   const dimensionText = dimensions
     ? `Scrap dimensions: ${dimensions}.`
     : "No dimensions provided.";
   const weightText = weightKg ? `Weight: ${weightKg}kg.` : "No weight provided.";
+  const sizeText = preferredSize
+    ? `The person wants something sized for: ${preferredSize}. Only suggest products that are realistically achievable at this size given the scrap's dimensions — say so in the description if the scrap is too small for that size.`
+    : "No preferred wearer size given.";
 
   const response = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
@@ -34,7 +37,7 @@ export async function classifyFabric({ imageBase64, mediaType, dimensions, weigh
             type: "image",
             source: { type: "base64", media_type: mediaType, data: imageBase64 },
           },
-          { type: "text", text: `${dimensionText} ${weightText}` },
+          { type: "text", text: `${dimensionText} ${weightText} ${sizeText}` },
         ],
       },
     ],

@@ -100,7 +100,69 @@ Don't fake the AI — build it for real, but keep it appropriately scoped for a
 
 ---
 
-## 3. What this produced
+## 3. Second build session — UI, mobile, admin, access control (consolidated)
 
-See `docs/implementation-plan.md` for the resulting architecture and
-`docs/STATUS.md` for what's actually built as of the last `/handoff`.
+A later session, after the first build above was already working end-to-end,
+added the following on top of it (consolidated from a long back-and-forth,
+not verbatim):
+
+```
+This is a team/platoon project for NYSC camp, not a two-person project —
+keep that framing.
+
+Make the UI mobile-first (most viewers will be on phones), add a hamburger
+menu for mobile nav, and rebuild the visual components in a minimal
+shadcn/ui-style look. Since this is a static-file build with no React/Vite
+bundler, hand-build the component classes rather than pulling in real
+shadcn (a full framework migration was explicitly rejected as too risky this
+close to the deadline). Split index.html's CSS and JS into their own files.
+Add GSAP and Three.js for tasteful, purely-decorative animation. Rename
+landingpage-dashboard/ to frontend/.
+
+Fix the upload box — it visually implied drag-and-drop but had no real drag
+event handlers wired up.
+
+Add a single super-admin login. The admin should be able to see real fal.ai
+and Claude credit balances — research whether each platform actually exposes
+that via API before building anything; never fake a number if it doesn't
+exist. (fal.ai has a real billing API; Anthropic does not expose a balance
+at all, only a real historical Cost Report API — built honestly around that
+constraint instead of faking a balance for Anthropic.)
+
+Because fal.ai's image-generation credit is genuinely low, gate
+/api/generate behind admin approval: visitors request access by name, the
+admin approves or denies each one from the admin panel, and only approved
+sessions can generate images. Don't auto-generate multiple images per scan —
+Claude's text suggestions are free to show; only the one image the user
+explicitly picks should ever hit fal.ai.
+
+Add an optional "preferred size" input (not required) that flows into both
+the Claude prompt (feasibility/suggestions) and the fal.ai prompt (sizing the
+rendered model shot).
+
+Handle the case where either AI's credit runs out, or an API key is
+invalid/revoked, with a clear "contact the admin" message instead of a raw
+error — distinguish the two cases.
+
+Add wait-time animations (rotating status text, a shimmer effect) during the
+Claude scan and fal.ai generation calls so the multi-second waits don't feel
+broken or boring.
+
+Prepare a Render deployment blueprint. Do not ask for a Render API key to be
+pasted into chat — instead, prepare a render.yaml with secrets marked
+sync:false so they're entered directly into Render's dashboard, and document
+the GitHub-connected Blueprint deploy flow.
+```
+
+Several live secrets (a fal.ai key, a fal.ai Admin key, an Anthropic Admin
+key) were pasted directly into chat during this session. Each was stored
+immediately in the gitignored `server/.env` and never echoed back or
+committed — same handling as the original two keys in section 2.
+
+---
+
+## 4. What this produced
+
+See `docs/implementation-plan.md` for the resulting architecture,
+`docs/STATUS.md` for what's actually built as of the last `/handoff`, and
+`docs/DEPLOY.md` for the Render deployment steps.
