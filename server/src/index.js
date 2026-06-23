@@ -17,6 +17,8 @@ const staticDir = process.env.STATIC_DIR
   || path.join(__dirname, "../../frontend");
 
 const app = express();
+// Trust Render's reverse proxy so secure session cookies work over HTTPS
+app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 app.use(
