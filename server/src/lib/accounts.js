@@ -39,3 +39,10 @@ export function listAccounts() {
 export function findAccount(id) {
   return accounts.find((a) => a.id === id);
 }
+
+export function deleteAccount(id) {
+  const idx = accounts.findIndex((a) => a.id === id);
+  if (idx === -1) return false;
+  accounts.splice(idx, 1);
+  return true;
+}

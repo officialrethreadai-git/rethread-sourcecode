@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { getFalBalance, getAnthropicSpend } from "../lib/billing.js";
-import { listAccounts, findAccount } from "../lib/accounts.js";
+import { listAccounts, findAccount, deleteAccount } from "../lib/accounts.js";
 import { getAiGateState, setAiPaused } from "../lib/aiGate.js";
 
 const router = Router();
@@ -76,6 +76,12 @@ router.post("/accounts/:id/deny", requireAdmin, (req, res) => {
   if (!account) return res.status(404).json({ error: "Account not found" });
 
   account.status = "denied";
+  res.json({ ok: true });
+});
+
+router.delete("/accounts/:id", requireAdmin, (req, res) => {
+  const removed = deleteAccount(req.params.id);
+  if (!removed) return res.status(404).json({ error: "Account not found" });
   res.json({ ok: true });
 });
 

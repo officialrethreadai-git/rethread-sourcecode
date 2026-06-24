@@ -447,7 +447,7 @@
 
         scanCounter += 1;
         const scanId = `scan-${scanCounter}`;
-        scanStore[scanId] = { base64: result.sourceImageBase64, mediaType: result.sourceMediaType };
+        scanStore[scanId] = { base64: result.sourceImageBase64, mediaType: result.sourceMediaType, fabricImageUrl: result.fabricImageUrl || null };
 
         renderScanSummary(result);
         renderFabricLore(result.materialType);
@@ -824,6 +824,7 @@
       const product = productStore[cardId];
       if (!product) return;
 
+      const scan = scanStore[product.scanId];
       const length = document.getElementById('input-length').value;
       const width = document.getElementById('input-width').value;
       const weightKg = document.getElementById('input-weight').value;
@@ -841,6 +842,7 @@
             weightKg: weightKg ? Number(weightKg) : null,
             priceNaira: product.valueNaira,
             imageUrl: product.imageUrl || null,
+            fabricImageUrl: scan?.fabricImageUrl || null,
           }),
         });
         if (res.status === 403) {
@@ -909,6 +911,33 @@
       }
     }
 
+    function renderListingImages(item, height) {
+      if (item.fabricImageUrl && item.imageUrl) {
+        return `
+          <div class="${height} flex">
+            <div class="flex-1 relative bg-forest-dark overflow-hidden">
+              <img src="${item.fabricImageUrl}" class="absolute inset-0 w-full h-full object-cover" alt="Raw fabric">
+              <span class="absolute bottom-1 left-1 text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded font-medium tracking-wide">RAW</span>
+            </div>
+            <div class="w-px bg-white/10 shrink-0"></div>
+            <div class="flex-1 relative bg-forest-dark overflow-hidden">
+              <img src="${item.imageUrl}" class="absolute inset-0 w-full h-full object-cover" alt="AI concept">
+              <span class="absolute bottom-1 right-1 text-[9px] bg-mint/80 text-white px-1.5 py-0.5 rounded font-medium tracking-wide">AI</span>
+            </div>
+          </div>`;
+      }
+      const url = item.imageUrl || item.fabricImageUrl || null;
+      return `
+        <div class="${height} bg-forest-dark ${url ? '' : 'flex flex-col items-center justify-center gap-2'}"
+          style="${url ? `background-image:url(${url});background-size:cover;background-position:center;` : ''}">
+          ${url ? '' : `
+            <svg class="w-10 h-10 text-offwhite-muted/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-[10px] text-offwhite-muted">No image yet</span>`}
+        </div>`;
+    }
+
     function renderMarketplaceGrid(listings) {
       const grid = document.getElementById('marketplace-grid');
 
@@ -919,14 +948,7 @@
 
       grid.innerHTML = listings.map((item) => `
         <div class="glass-panel rounded-2xl overflow-hidden flex flex-col">
-          <div class="h-44 bg-forest-dark ${item.imageUrl ? '' : 'flex flex-col items-center justify-center gap-2'}"
-            style="${item.imageUrl ? `background-image:url(${item.imageUrl});background-size:cover;background-position:center;` : ''}">
-            ${item.imageUrl ? '' : `
-              <svg class="w-10 h-10 text-offwhite-muted/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              <span class="text-[10px] text-offwhite-muted">No image yet</span>`}
-          </div>
+          ${renderListingImages(item, 'h-44')}
           <div class="p-4 flex flex-col gap-3 flex-grow">
             <div>
               <h3 class="font-display font-bold text-base text-offwhite leading-tight">${item.title}</h3>
@@ -1113,16 +1135,10 @@
         grid.innerHTML = `<div class="col-span-2 lg:col-span-3 glass-panel p-6 rounded-2xl text-center"><p class="text-sm text-offwhite-muted">${emptyText}</p></div>`;
         return;
       }
+      const isPurchases = gridId === 'my-purchases-grid';
       grid.innerHTML = items.map((item) => `
         <div class="glass-panel rounded-2xl overflow-hidden flex flex-col">
-          <div class="h-36 bg-forest-dark ${item.imageUrl ? '' : 'flex flex-col items-center justify-center gap-1.5'}"
-            style="${item.imageUrl ? `background-image:url(${item.imageUrl});background-size:cover;background-position:center;` : ''}">
-            ${item.imageUrl ? '' : `
-              <svg class="w-8 h-8 text-offwhite-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              <span class="text-[10px] text-offwhite-muted">No image</span>`}
-          </div>
+          ${renderListingImages(item, 'h-36')}
           <div class="p-4 flex flex-col gap-2">
             <h3 class="font-display font-bold text-sm text-offwhite">${item.title}</h3>
             <div class="flex items-center justify-between">
@@ -1130,9 +1146,26 @@
               <span class="sc-badge px-2.5 py-1 text-[10px] font-semibold uppercase ${item.status === 'reserved' ? 'bg-amber-50 border-amber-200 text-amber-700' : ''}">${item.status}</span>
             </div>
             ${item.buyerName ? `<span class="text-[10px] text-offwhite-muted">Reserved by ${item.buyerName}</span>` : ''}
+            ${isPurchases && item.status === 'reserved' ? `
+              <button onclick="unreserveListing('${item.id}')" class="sc-btn sc-btn-outline sc-btn-sm w-full mt-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                Cancel Reservation
+              </button>` : ''}
           </div>
         </div>
       `).join('');
+    }
+
+    async function unreserveListing(id) {
+      try {
+        const res = await fetch(`${API_BASE}/api/marketplace/${id}/unreserve`, { method: 'POST' });
+        if (!res.ok) throw new Error(`Failed (${res.status})`);
+        showToast('Reservation cancelled — item is back on the marketplace', 'success');
+        loadMyDashboard();
+        if (activeTab === 'marketplace') loadMarketplace();
+      } catch (err) {
+        showToast(`Couldn't cancel: ${err.message}`, 'error');
+      }
     }
 
     // UPDATE STATS COUNTER ACTION (driven by real weight input + real suggestion count)

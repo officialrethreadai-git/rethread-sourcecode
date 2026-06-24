@@ -108,7 +108,7 @@ router.post("/", (req, res) => {
     });
   }
 
-  const { title, materialType, dimensions, weightKg, priceNaira, imageUrl } = req.body;
+  const { title, materialType, dimensions, weightKg, priceNaira, imageUrl, fabricImageUrl } = req.body;
   if (!title || !priceNaira) {
     return res.status(400).json({ error: "title and priceNaira are required" });
   }
@@ -123,6 +123,7 @@ router.post("/", (req, res) => {
     vendor: req.session.userName,
     vendorId: req.session.userId,
     imageUrl: imageUrl || null,
+    fabricImageUrl: fabricImageUrl || null,
     status: "available",
     buyerId: null,
     buyerName: null,
@@ -162,6 +163,24 @@ router.post("/requests", (req, res) => {
 
   requests.unshift(request);
   res.status(201).json(request);
+});
+
+// POST /api/marketplace/:id/unreserve — cancel a reservation (buyer only)
+router.post("/:id/unreserve", (req, res) => {
+  if (!req.session?.userId) {
+    return res.status(401).json({ error: "Sign in to cancel a reservation" });
+  }
+
+  const listing = listings.find((l) => l.id === req.params.id);
+  if (!listing) return res.status(404).json({ error: "Listing not found" });
+  if (listing.buyerId !== req.session.userId) {
+    return res.status(403).json({ error: "You didn't reserve this item" });
+  }
+
+  listing.status = "available";
+  listing.buyerId = null;
+  listing.buyerName = null;
+  res.json(listing);
 });
 
 // POST /api/marketplace/:id/reserve — claim a listing (approved users only)

@@ -186,15 +186,24 @@ function renderAccounts(accounts) {
           <div class="flex gap-2">
             <button onclick="respondToAccount('${a.id}', 'approve')" class="sc-btn sc-btn-primary sc-btn-sm">Approve</button>
             <button onclick="respondToAccount('${a.id}', 'deny')" class="sc-btn sc-btn-outline sc-btn-sm">Deny</button>
+            <button onclick="deleteAccount('${a.id}')" class="sc-btn sc-btn-sm bg-red-50 border border-red-200 text-red-600 hover:bg-red-100" title="Delete account">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
           </div>
         </div>
       `).join('')}
     </div>
     ${decided.length ? `
       <details class="text-xs text-offwhite-muted">
-        <summary class="cursor-pointer">Recent decisions</summary>
-        <div class="mt-2 space-y-1">
-          ${decided.map((a) => `<div>${escapeHtml(a.name)} (${escapeHtml(a.email)}) — ${a.status}</div>`).join('')}
+        <summary class="cursor-pointer">Recent decisions (${decided.length})</summary>
+        <div class="mt-2 space-y-2">
+          ${decided.map((a) => `
+            <div class="flex items-center justify-between gap-3">
+              <span>${escapeHtml(a.name)} (${escapeHtml(a.email)}) — <strong>${a.status}</strong></span>
+              <button onclick="deleteAccount('${a.id}')" class="sc-btn sc-btn-sm bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 shrink-0" title="Delete account">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>`).join('')}
         </div>
       </details>` : ''}
   `;
@@ -202,6 +211,13 @@ function renderAccounts(accounts) {
 
 async function respondToAccount(id, action) {
   await fetch(`${API_BASE}/api/admin/accounts/${id}/${action}`, { method: 'POST' });
+  loadAccounts();
+}
+
+async function deleteAccount(id) {
+  if (!confirm('Delete this account? This cannot be undone.')) return;
+  const res = await fetch(`${API_BASE}/api/admin/accounts/${id}`, { method: 'DELETE' });
+  if (!res.ok) { alert('Delete failed'); return; }
   loadAccounts();
 }
 

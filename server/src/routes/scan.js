@@ -1,11 +1,31 @@
 import { Router } from "express";
+import { writeFile, mkdir } from "node:fs/promises";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { randomUUID } from "node:crypto";
 import multer from "multer";
 import { classifyFabric } from "../lib/anthropic.js";
 import { isCreditExhaustedError, isAuthError } from "../lib/billing.js";
 import { isAiPaused } from "../lib/aiGate.js";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const GENERATED_DIR = join(__dirname, "../../../frontend/generated");
+
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 const router = Router();
+
+async function persistFabricImage(buffer, mimetype) {
+  try {
+    const ext = mimetype === "image/png" ? "png" : "jpg";
+    const filename = `fabric-${randomUUID()}.${ext}`;
+    await mkdir(GENERATED_DIR, { recursive: true });
+    await writeFile(join(GENERATED_DIR, filename), buffer);
+    return `/generated/${filename}`;
+  } catch (err) {
+    console.warn("[/api/scan] fabric image save failed:", err.message);
+    return null;
+  }
+}
 
 router.post("/", upload.single("image"), async (req, res) => {
   if (!req.session?.aiApproved) {
@@ -25,18 +45,22 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 
   try {
-    const result = await classifyFabric({
-      imageBase64: req.file.buffer.toString("base64"),
-      mediaType: req.file.mimetype,
-      dimensions: req.body.dimensions,
-      weightKg: req.body.weightKg,
-      preferredSize: req.body.preferredSize,
-    });
+    const [result, fabricImageUrl] = await Promise.all([
+      classifyFabric({
+        imageBase64: req.file.buffer.toString("base64"),
+        mediaType: req.file.mimetype,
+        dimensions: req.body.dimensions,
+        weightKg: req.body.weightKg,
+        preferredSize: req.body.preferredSize,
+      }),
+      persistFabricImage(req.file.buffer, req.file.mimetype),
+    ]);
 
     res.json({
       ...result,
       sourceImageBase64: req.file.buffer.toString("base64"),
       sourceMediaType: req.file.mimetype,
+      fabricImageUrl,
     });
   } catch (err) {
     console.error("[/api/scan] failed:", err);
